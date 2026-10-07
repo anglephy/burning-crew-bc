@@ -9,47 +9,45 @@
     <style>
         * { -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; overflow-x: hidden; }
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; padding-bottom: 80px; }
-        .header { background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); padding: 15px; text-align: center; font-weight: bold; font-size: 1.5rem; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; padding-bottom: 90px; }
+        .header { background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); padding: 15px; text-align: center; font-weight: bold; font-size: 1.4rem; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .header i { margin-right: 8px; }
-        .nav-tabs { background: white; border-bottom: 2px solid #e9ecef; overflow-x: auto; -webkit-overflow-scrolling: touch; position: sticky; top: 60px; z-index: 99; gap: 0; }
-        .nav-tabs .nav-link { font-weight: 600; color: #495057; border: none; padding: 12px 10px; font-size: 0.9rem; white-space: nowrap; flex-shrink: 0; transition: all 0.3s ease; border-bottom: 3px solid transparent; }
-        .nav-tabs .nav-link:hover { color: #0d6efd; background-color: #f8f9fa; }
+        .nav-tabs { background: white; border-bottom: 2px solid #e9ecef; overflow-x: auto; -webkit-overflow-scrolling: touch; position: sticky; top: 57px; z-index: 99; gap: 0; display: flex; flex-wrap: nowrap; }
+        .nav-tabs .nav-link { font-weight: 600; color: #495057; border: none; padding: 12px 12px; font-size: 0.9rem; white-space: nowrap; flex-shrink: 0; transition: all 0.2s ease; border-bottom: 3px solid transparent; }
         .nav-tabs .nav-link.active { background-color: #0d6efd; color: white; border-bottom: 3px solid #0d6efd; }
-        .card { margin-top: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e9ecef; }
+        .card { margin-top: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e9ecef; }
         .card-header { font-weight: bold; background-color: #fff; border-bottom: 2px solid #0d6efd; padding: 12px 15px; border-radius: 10px 10px 0 0; }
         .card-body { padding: 12px 15px; }
         .table { font-size: 0.85rem; margin-bottom: 0; }
         .table th, .table td { text-align: center; vertical-align: middle; padding: 8px 4px; }
         .table th { font-weight: 600; background-color: #f8f9fa; font-size: 0.75rem; }
-        .btn-custom { font-weight: 600; padding: 10px 15px; font-size: 0.95rem; border-radius: 6px; transition: all 0.3s ease; }
-        .btn-custom:active { transform: scale(0.98); }
-        .mission-summary-box { background: linear-gradient(135deg, #f1f8ff 0%, #e3f2fd 100%); border: 2px solid #b6d4fe; border-radius: 10px; padding: 15px; margin-top: 12px; }
-        .form-control, .form-select { border-radius: 6px; border: 1px solid #dee2e6; padding: 8px 10px; font-size: 1rem; }
-        .member-card { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 10px; transition: all 0.2s ease; }
+        .btn-custom { font-weight: 600; padding: 10px 15px; font-size: 0.95rem; border-radius: 6px; }
+        .mission-summary-box { background: linear-gradient(135deg, #f1f8ff 0%, #e3f2fd 100%); border: 2px solid #b6d4fe; border-radius: 10px; padding: 12px; margin-top: 12px; }
+        .form-control, .form-select { border-radius: 6px; border: 1px solid #dee2e6; padding: 8px 10px; font-size: 0.95rem; }
+        .member-card { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
         .member-card.checked { background-color: #e7f3ff; border-color: #0d6efd; }
         .member-info { font-weight: 600; font-size: 0.95rem; margin-bottom: 8px; }
         .member-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 0.8rem; }
-        .member-option-label { display: flex; align-items: center; gap: 4px; padding: 6px; background-color: #f8f9fa; border-radius: 4px; cursor: pointer; }
-        .score-input-row { background: white; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .score-input-row .name { font-weight: 600; min-width: 50px; font-size: 0.9rem; }
-        .score-input-row input[type="number"] { width: 70px; padding: 6px 8px; font-size: 0.9rem; }
-        .score-input-row .score-result { flex: 1; text-align: center; font-weight: 600; color: #0d6efd; font-size: 0.9rem; }
-        .score-input-row .mission-checks { display: flex; gap: 6px; }
-        .score-input-row .mission-checks input { cursor: pointer; width: 18px; height: 18px; }
-        .badge { padding: 4px 8px; font-size: 0.75rem; font-weight: 600; }
+        .member-option-label { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 4px; background-color: #f8f9fa; border-radius: 6px; cursor: pointer; border: 1px solid #e9ecef; }
+        .score-input-row { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .score-input-row .name-area { display: flex; flex-direction: column; min-width: 65px; }
+        .score-input-row .name { font-weight: 700; font-size: 0.9rem; }
+        .score-input-row input[type="number"] { width: 75px; text-align: center; font-weight: bold; font-size: 1.05rem; }
+        .score-input-row .score-result { min-width: 60px; text-align: center; font-weight: 700; color: #0d6efd; font-size: 0.95rem; }
+        .score-input-row .mission-checks { display: flex; gap: 8px; }
+        .score-input-row .mission-checks label { display: flex; align-items: center; gap: 2px; font-size: 0.75rem; font-weight: bold; background: #f8f9fa; padding: 4px 6px; border-radius: 4px; border: 1px solid #dee2e6; }
+        .score-input-row .mission-checks input { width: 18px; height: 18px; cursor: pointer; }
+        .badge { padding: 4px 6px; font-size: 0.7rem; font-weight: 600; }
         .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-        .fab { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4); cursor: pointer; }
-        .result-row { background: white; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-        .result-rank { font-weight: 700; font-size: 1.1rem; width: 40px; height: 40px; background-color: #f8f9fa; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0d6efd; }
-        .result-info { flex: 1; margin-left: 12px; }
-        .result-info .name { font-weight: 600; font-size: 0.95rem; }
-        .result-info .score { color: #6c757d; font-size: 0.85rem; margin-top: 2px; }
-        .result-score { font-weight: 700; font-size: 1.1rem; color: #0d6efd; text-align: right; }
-        
-        /* 걷을 돈 탭 입금 완료 배경 스타일 */
-        .paid-row { background-color: #d1e7dd !important; }
-        .paid-check-input { width: 20px; height: 20px; cursor: pointer; }
+        .fab { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4); cursor: pointer; }
+        .result-row { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .result-rank { font-weight: 800; font-size: 1.1rem; width: 36px; height: 36px; background-color: #f8f9fa; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0d6efd; }
+        .result-info { flex: 1; margin-left: 10px; }
+        .result-info .name { font-weight: 700; font-size: 0.95rem; }
+        .result-info .score { color: #6c757d; font-size: 0.8rem; margin-top: 2px; }
+        .result-score { font-weight: 800; font-size: 1.1rem; color: #0d6efd; text-align: right; }
+        .paid-row { background-color: #e8f5e9 !important; }
+        .paid-check-input { width: 22px; height: 22px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -60,7 +58,7 @@
 
 <ul class="nav nav-tabs nav-justified" id="mainTab" role="tablist">
     <li class="nav-item"><button class="nav-link active" id="setting-tab" onclick="openTab('setting')"><i class="fas fa-cog"></i> 설정</button></li>
-    <li class="nav-item"><button class="nav-link" id="fee-tab" onclick="openTab('fee')"><i class="fas fa-money-bill"></i> 돈</button></li>
+    <li class="nav-item"><button class="nav-link" id="fee-tab" onclick="openTab('fee')"><i class="fas fa-wallet"></i> 돈</button></li>
     <li class="nav-item"><button class="nav-link" id="g1-tab" onclick="openTab('g1')">1G</button></li>
     <li class="nav-item"><button class="nav-link" id="g2-tab" onclick="openTab('g2')">2G</button></li>
     <li class="nav-item"><button class="nav-link" id="g3-tab" onclick="openTab('g3')">3G</button></li>
@@ -72,40 +70,40 @@
     <!-- 1. 설정 탭 -->
     <div id="tab-setting" class="tab-content-item">
         <div class="card">
-            <div class="card-header"><i class="fas fa-sliders-h"></i> 핸디 / 한도 및 기본 비용 설정</div>
+            <div class="card-header"><i class="fas fa-sliders-h"></i> 핸디 및 기본 비용 설정</div>
             <div class="card-body">
                 <div class="row g-2">
                     <div class="col-6 col-md-4">
                         <label class="form-label fw-bold small">여성 핸디</label>
-                        <input type="number" id="femaleHandicap" class="form-control form-control-sm" value="15" onchange="calculateAll()">
+                        <input type="number" inputmode="numeric" id="femaleHandicap" class="form-control form-control-sm" value="15" onchange="calculateAll()">
                     </div>
                     <div class="col-6 col-md-4">
                         <label class="form-label fw-bold small">남성 한도</label>
-                        <input type="number" id="maleLimit" class="form-control form-control-sm" value="210" onchange="calculateAll()">
+                        <input type="number" inputmode="numeric" id="maleLimit" class="form-control form-control-sm" value="210" onchange="calculateAll()">
                     </div>
                     <div class="col-6 col-md-4">
                         <label class="form-label fw-bold small">여성 한도</label>
-                        <input type="number" id="femaleLimit" class="form-control form-control-sm" value="200" onchange="calculateAll()">
+                        <input type="number" inputmode="numeric" id="femaleLimit" class="form-control form-control-sm" value="200" onchange="calculateAll()">
                     </div>
                     <div class="col-6 col-md-4">
                         <label class="form-label fw-bold small">게임비</label>
-                        <input type="number" id="gameFee" class="form-control form-control-sm" value="14000">
+                        <input type="number" inputmode="numeric" id="gameFee" class="form-control form-control-sm" value="14000" onchange="renderFeeTable()">
                     </div>
                     <div class="col-6 col-md-4">
                         <label class="form-label fw-bold small">팀전비</label>
-                        <input type="number" id="teamFee" class="form-control form-control-sm" value="8000">
+                        <input type="number" inputmode="numeric" id="teamFee" class="form-control form-control-sm" value="8000" onchange="renderFeeTable()">
                     </div>
                     <div class="col-6 col-md-4">
                         <label class="form-label fw-bold small">개인사이드</label>
-                        <input type="number" id="sideFee" class="form-control form-control-sm" value="20000">
+                        <input type="number" inputmode="numeric" id="sideFee" class="form-control form-control-sm" value="20000" onchange="renderFeeTable()">
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span><i class="fas fa-cloud"></i> 구글 스프레드시트 API 연동</span>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-cloud"></i> 구글 시트 명단 동기화</span>
                 <button class="btn btn-primary btn-sm py-1 px-2" style="font-size: 0.8rem;" onclick="fetchGoogleSheetApi()"><i class="fas fa-sync"></i> 동기화</button>
             </div>
             <div class="card-body">
@@ -113,7 +111,7 @@
                     <label class="form-label fw-bold small">Apps Script Web App API URL</label>
                     <input type="text" id="apiUrl" class="form-control form-control-sm" placeholder="https://script.google.com/macros/s/.../exec">
                 </div>
-                <textarea id="memberDBText" class="form-control form-control-sm" rows="4" placeholder="API 연결 시 자동으로 회원 목록이 로드됩니다."></textarea>
+                <textarea id="memberDBText" class="form-control form-control-sm" rows="3" placeholder="API 연결 시 자동으로 회원 목록이 로드됩니다."></textarea>
                 <button class="btn btn-secondary btn-sm w-100 mt-2 btn-custom" onclick="saveMemberDB()"><i class="fas fa-download"></i> 명단 수동 적용</button>
             </div>
         </div>
@@ -121,7 +119,6 @@
         <div class="card">
             <div class="card-header"><i class="fas fa-users"></i> 참석자 선택 및 옵션 지정</div>
             <div class="card-body">
-                <p class="small text-muted mb-2">참석 여부 및 미션(사이드, AC, TT)을 선택하세요.</p>
                 <div id="attendeeCheckboxes" class="mb-3"></div>
                 <button class="btn btn-success w-100 btn-custom" onclick="loadAttendees()"><i class="fas fa-check"></i> 참석자 확정</button>
             </div>
@@ -146,11 +143,11 @@
                                 <th>사이드</th>
                                 <th>미션</th>
                                 <th>합계</th>
-                                <th>입금확인</th>
+                                <th>입금</th>
                             </tr>
                         </thead>
                         <tbody id="feeTableBody">
-                            <tr><td colspan="7" class="text-muted text-center py-3">참석자를 먼저 불러와주세요.</td></tr>
+                            <tr><td colspan="7" class="text-muted text-center py-3">참석자를 먼저 확정해주세요.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -160,60 +157,35 @@
 
     <!-- 3~6. 1G~4G 탭 -->
     <div id="tab-g1" class="tab-content-item" style="display:none;">
-        <div class="card">
-            <div class="card-header"><i class="fas fa-1"></i> 1게임 점수 입력</div>
-            <div class="card-body p-2">
-                <div id="g1ScoreInputs"></div>
-                <div id="g1MissionSummary" class="mission-summary-box" style="display:none;"></div>
-            </div>
-        </div>
+        <div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 1게임 점수 입력</div><div class="card-body p-2"><div id="g1ScoreInputs"></div><div id="g1MissionSummary" class="mission-summary-box" style="display:none;"></div></div></div>
     </div>
-
     <div id="tab-g2" class="tab-content-item" style="display:none;">
-        <div class="card">
-            <div class="card-header"><i class="fas fa-2"></i> 2게임 점수 입력</div>
-            <div class="card-body p-2">
-                <div id="g2ScoreInputs"></div>
-                <div id="g2MissionSummary" class="mission-summary-box" style="display:none;"></div>
-            </div>
-        </div>
+        <div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 2게임 점수 입력</div><div class="card-body p-2"><div id="g2ScoreInputs"></div><div id="g2MissionSummary" class="mission-summary-box" style="display:none;"></div></div></div>
     </div>
-
     <div id="tab-g3" class="tab-content-item" style="display:none;">
-        <div class="card">
-            <div class="card-header"><i class="fas fa-3"></i> 3게임 점수 입력</div>
-            <div class="card-body p-2">
-                <div id="g3ScoreInputs"></div>
-                <div id="g3MissionSummary" class="mission-summary-box" style="display:none;"></div>
-            </div>
-        </div>
+        <div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 3게임 점수 입력</div><div class="card-body p-2"><div id="g3ScoreInputs"></div><div id="g3MissionSummary" class="mission-summary-box" style="display:none;"></div></div></div>
     </div>
-
     <div id="tab-g4" class="tab-content-item" style="display:none;">
-        <div class="card">
-            <div class="card-header"><i class="fas fa-4"></i> 4게임 점수 입력</div>
-            <div class="card-body p-2">
-                <div id="g4ScoreInputs"></div>
-                <div id="g4MissionSummary" class="mission-summary-box" style="display:none;"></div>
-            </div>
-        </div>
+        <div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 4게임 점수 입력</div><div class="card-body p-2"><div id="g4ScoreInputs"></div><div id="g4MissionSummary" class="mission-summary-box" style="display:none;"></div></div></div>
     </div>
 
     <!-- 7. 상금 탭 -->
     <div id="tab-prize" class="tab-content-item" style="display:none;">
         <div class="card">
-            <div class="card-header"><i class="fas fa-chart-bar"></i> 최종 순위</div>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-chart-bar"></i> 최종 순위</span>
+                <button class="btn btn-outline-primary btn-sm py-1" onclick="copyKakaoSummary()"><i class="fas fa-copy"></i> 카톡 복사</button>
+            </div>
             <div class="card-body p-2">
-                <div id="prizeTableBody">
-                    <div class="text-muted text-center py-3">점수를 입력하면 자동으로 순위가 계산됩니다.</div>
-                </div>
+                <div id="prizeTableBody"></div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><i class="fas fa-info-circle"></i> 정산 요약</div>
-            <div class="card-body">
-                <div id="settlementSummary" class="text-muted text-center py-2">-</div>
+            <div class="card-header"><i class="fas fa-info-circle"></i> 정산 요약 및 저장</div>
+            <div class="card-body text-center">
+                <div id="settlementSummary" class="text-start mb-3">-</div>
+                <button class="btn btn-primary w-100 btn-custom" onclick="saveToGoogleSheet()"><i class="fas fa-cloud-upload-alt"></i> ☁️ 구글 시트로 최종 저장</button>
             </div>
         </div>
     </div>
@@ -221,13 +193,13 @@
 
 <div class="fab-container">
     <button class="fab" title="초기화" onclick="resetAll()"><i class="fas fa-redo"></i></button>
-    <button class="fab" title="저장" onclick="saveState()" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);"><i class="fas fa-save"></i></button>
+    <button class="fab" title="저장" onclick="saveState(true)" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);"><i class="fas fa-save"></i></button>
 </div>
 
 <script>
     let membersDB = [];
     let attendees = [];
-    const STORAGE_KEY = "burning_crew_state";
+    const STORAGE_KEY = "burning_crew_state_v2";
     const API_URL_KEY = "burning_api_url";
     const MEMBER_DB_KEY = "burning_members";
 
@@ -235,7 +207,7 @@
         loadStoredState();
     };
 
-    function saveState() {
+    function saveState(showMsg = false) {
         let state = {
             femaleHandicap: document.getElementById("femaleHandicap").value,
             maleLimit: document.getElementById("maleLimit").value,
@@ -247,7 +219,7 @@
             timestamp: new Date().toISOString()
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        showToast("✅ 저장되었습니다");
+        if(showMsg) showToast("✅ 현재 상태가 저장되었습니다");
     }
 
     function loadStoredState() {
@@ -262,15 +234,11 @@
                 document.getElementById("teamFee").value = state.teamFee || 8000;
                 document.getElementById("sideFee").value = state.sideFee || 20000;
                 attendees = state.attendees || [];
-            } catch(e) {
-                console.log("저장된 상태를 불러올 수 없습니다");
-            }
+            } catch(e) { console.log(e); }
         }
 
         let savedApiUrl = localStorage.getItem(API_URL_KEY);
-        if(savedApiUrl) {
-            document.getElementById("apiUrl").value = savedApiUrl;
-        }
+        if(savedApiUrl) document.getElementById("apiUrl").value = savedApiUrl;
 
         let savedDB = localStorage.getItem(MEMBER_DB_KEY);
         if(savedDB && savedDB.trim() !== "") {
@@ -284,12 +252,11 @@
             renderFeeTable();
             renderGameTables();
             calculateAll();
-            openTab('fee');
         }
     }
 
     function resetAll() {
-        if(confirm("⚠️ 모든 데이터를 초기화하시겠습니까?")) {
+        if(confirm("⚠️ 작성 중인 모든 점수와 참석자 데이터가 초기화됩니다. 계속하시겠습니까?")) {
             localStorage.removeItem(STORAGE_KEY);
             attendees = [];
             location.reload();
@@ -298,8 +265,8 @@
 
     function showToast(message) {
         let toast = document.createElement("div");
-        toast.className = "alert alert-info position-fixed bottom-0 end-0 m-3 action-feedback";
-        toast.style.maxWidth = "300px";
+        toast.className = "alert alert-info position-fixed bottom-0 end-0 m-3";
+        toast.style.zIndex = "2000";
         toast.innerHTML = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2000);
@@ -319,11 +286,7 @@
 
     async function fetchGoogleSheetApi() {
         let url = document.getElementById("apiUrl").value.trim();
-        if(!url) {
-            alert("Apps Script API URL을 입력해 주세요.");
-            return;
-        }
-
+        if(!url) { alert("Apps Script API URL을 입력해 주세요."); return; }
         localStorage.setItem(API_URL_KEY, url);
 
         try {
@@ -337,22 +300,14 @@
                     let name = item.name || item[0];
                     let ave = item.ave || item.average || item[1];
                     let gender = item.gender || item[2] || '남';
-
-                    if(name && ave) {
-                        parsedText += `${name} ${ave} ${gender}\n`;
-                    }
+                    let attendRate = item.attendRate || item[3] || 0;
+                    if(name && ave) parsedText += `${name} ${ave} ${gender} ${attendRate}\n`;
                 });
-
                 document.getElementById("memberDBText").value = parsedText.trim();
                 saveMemberDB();
-                showToast("✅ API 동기화 완료!");
-            } else {
-                alert("구글 시트에서 회원 데이터를 불러올 수 없습니다.");
+                showToast("✅ 명단 동기화 완료!");
             }
-        } catch(err) {
-            alert("API 연결 중 오류가 발생했습니다.");
-            console.error(err);
-        }
+        } catch(err) { alert("API 연결 중 오류가 발생했습니다."); }
     }
 
     function saveMemberDB() {
@@ -374,32 +329,27 @@
                 let name = parts[0];
                 let ave = parseInt(parts[1]) || 0;
                 let gender = parts[2] || '남';
-                membersDB.push({ name, ave, gender });
+                let attendRate = parseFloat(parts[3]) || 0;
+
+                // 참석율 높을 시 (예: 50% 이상) 기본 체크 자동 적용 추천
+                let autoCheck = attendRate >= 50;
+                membersDB.push({ name, ave, gender, attendRate });
 
                 let div = document.createElement("div");
-                div.className = "member-card";
+                div.className = `member-card ${autoCheck ? 'checked' : ''}`;
                 div.innerHTML = `
                     <div class="member-info d-flex align-items-center justify-content-between">
                         <label class="form-check-label d-flex align-items-center gap-2 m-0 flex-grow-1">
-                            <input class="form-check-input member-check" type="checkbox" value="${index}" onchange="updateMemberCard(this)">
-                            <span>${name}</span>
+                            <input class="form-check-input member-check" type="checkbox" value="${index}" ${autoCheck ? 'checked' : ''} onchange="updateMemberCard(this)">
+                            <span class="fw-bold">${name}</span>
                             <span class="badge ${gender === '여' || gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${gender}</span>
-                            <span class="text-muted small">${ave}</span>
+                            <span class="text-muted small">Avg ${ave}</span>
                         </label>
                     </div>
                     <div class="member-options">
-                        <label class="member-option-label">
-                            <input type="checkbox" id="side_${index}" checked>
-                            <span>사이드</span>
-                        </label>
-                        <label class="member-option-label">
-                            <input type="checkbox" id="ac_${index}" checked>
-                            <span>AC</span>
-                        </label>
-                        <label class="member-option-label">
-                            <input type="checkbox" id="tt_${index}" checked>
-                            <span>TT</span>
-                        </label>
+                        <label class="member-option-label"><input type="checkbox" id="side_${index}" checked> 사이드</label>
+                        <label class="member-option-label"><input type="checkbox" id="ac_${index}" checked> AC</label>
+                        <label class="member-option-label"><input type="checkbox" id="tt_${index}" checked> TT</label>
                     </div>
                 `;
                 container.appendChild(div);
@@ -415,28 +365,20 @@
 
     function loadAttendees() {
         let checkboxes = document.querySelectorAll(".member-check:checked");
-        if(checkboxes.length === 0) {
-            alert("참석할 멤버를 선택해주세요.");
-            return;
-        }
+        if(checkboxes.length === 0) { alert("참석할 멤버를 선택해주세요."); return; }
 
         attendees = [];
         checkboxes.forEach(chk => {
             let idx = parseInt(chk.value);
             let m = membersDB[idx];
-            
-            let joinSide = document.getElementById(`side_${idx}`).checked;
-            let joinAC = document.getElementById(`ac_${idx}`).checked;
-            let joinTT = document.getElementById(`tt_${idx}`).checked;
-
             attendees.push({
                 name: m.name,
                 ave: m.ave,
                 gender: m.gender,
-                joinSide: joinSide,
-                joinAC: joinAC,
-                joinTT: joinTT,
-                isPaid: false, // 입금 여부 기본값
+                joinSide: document.getElementById(`side_${idx}`).checked,
+                joinAC: document.getElementById(`ac_${idx}`).checked,
+                joinTT: document.getElementById(`tt_${idx}`).checked,
+                isPaid: false,
                 g1: 0, g2: 0, g3: 0, g4: 0,
                 acSuccess: [false, false, false, false],
                 ttSuccess: [false, false, false, false]
@@ -444,17 +386,17 @@
         });
 
         attendees.sort((a, b) => b.ave - a.ave);
-
         saveState();
         renderFeeTable();
         renderGameTables();
         calculateAll();
-        showToast("✅ 참석자가 확정되었습니다");
+        showToast("✅ 참석자 확정 완료");
         openTab('fee');
     }
 
     function renderFeeTable() {
         let tbody = document.getElementById("feeTableBody");
+        if (!tbody) return;
         tbody.innerHTML = "";
 
         let baseGame = parseInt(document.getElementById("gameFee").value) || 0;
@@ -462,7 +404,6 @@
         let baseSide = parseInt(document.getElementById("sideFee").value) || 0;
 
         let paidCount = 0;
-
         attendees.forEach((a, idx) => {
             let sideVal = a.joinSide ? baseSide : 0;
             let missionVal = (a.joinAC ? 8000 : 0) + (a.joinTT ? 4000 : 0);
@@ -480,17 +421,13 @@
                 <td>${sideVal.toLocaleString()}</td>
                 <td>${missionVal.toLocaleString()}</td>
                 <td class="fw-bold text-primary">${total.toLocaleString()}원</td>
-                <td>
-                    <input type="checkbox" class="paid-check-input" ${a.isPaid ? 'checked' : ''} onchange="togglePaid(${idx}, this.checked)">
-                </td>
+                <td><input type="checkbox" class="paid-check-input" ${a.isPaid ? 'checked' : ''} onchange="togglePaid(${idx}, this.checked)"></td>
             `;
             tbody.appendChild(tr);
         });
 
         let paidBadge = document.getElementById("paidSummaryBadge");
-        if (paidBadge) {
-            paidBadge.innerText = `입금완료: ${paidCount} / ${attendees.length}명`;
-        }
+        if (paidBadge) paidBadge.innerText = `입금완료: ${paidCount} / ${attendees.length}명`;
     }
 
     function togglePaid(idx, checked) {
@@ -502,19 +439,21 @@
     function renderGameTables() {
         for(let g = 1; g <= 4; g++) {
             let container = document.getElementById(`g${g}ScoreInputs`);
+            if (!container) continue;
             container.innerHTML = "";
             attendees.forEach((a, idx) => {
-                let genderBadgeClass = a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary';
                 let div = document.createElement("div");
                 div.className = "score-input-row";
                 div.innerHTML = `
-                    <span class="name">${a.name}</span>
-                    <span class="badge ${genderBadgeClass}">${a.gender}</span>
-                    <input type="number" class="form-control form-control-sm" style="width:70px;" min="0" max="300" value="${a['g'+g] || ''}" placeholder="점수" onchange="updateScore(${idx}, ${g}, this.value)">
+                    <div class="name-area">
+                        <span class="name">${a.name}</span>
+                        <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}" style="width:fit-content">${a.gender}</span>
+                    </div>
+                    <input type="number" inputmode="numeric" class="form-control form-control-sm" min="0" max="300" value="${a['g'+g] || ''}" placeholder="점수" onchange="updateScore(${idx}, ${g}, this.value)">
                     <span class="score-result" id="handi_${g}_${idx}">-</span>
                     <div class="mission-checks">
-                        <input type="checkbox" ${!a.joinAC ? 'disabled' : ''} ${a.acSuccess[g-1] ? 'checked' : ''} title="AC" onchange="updateMission(${idx}, ${g}, 'ac', this.checked)">
-                        <input type="checkbox" ${!a.joinTT ? 'disabled' : ''} ${a.ttSuccess[g-1] ? 'checked' : ''} title="TT" onchange="updateMission(${idx}, ${g}, 'tt', this.checked)">
+                        <label><input type="checkbox" ${!a.joinAC ? 'disabled' : ''} ${a.acSuccess[g-1] ? 'checked' : ''} onchange="updateMission(${idx}, ${g}, 'ac', this.checked)"> AC</label>
+                        <label><input type="checkbox" ${!a.joinTT ? 'disabled' : ''} ${a.ttSuccess[g-1] ? 'checked' : ''} onchange="updateMission(${idx}, ${g}, 'tt', this.checked)"> TT</label>
                     </div>
                 `;
                 container.appendChild(div);
@@ -524,8 +463,8 @@
 
     function updateScore(idx, game, val) {
         let score = parseInt(val) || 0;
+        if(score > 300) { alert("볼링 최고 점수는 300점입니다."); score = 300; }
         if(score < 0) score = 0;
-        if(score > 300) score = 300;
         
         attendees[idx]['g' + game] = score;
         calculateAll();
@@ -533,11 +472,8 @@
     }
 
     function updateMission(idx, game, type, checked) {
-        if (type === 'ac') {
-            attendees[idx].acSuccess[game - 1] = checked;
-        } else if (type === 'tt') {
-            attendees[idx].ttSuccess[game - 1] = checked;
-        }
+        if (type === 'ac') attendees[idx].acSuccess[game - 1] = checked;
+        else if (type === 'tt') attendees[idx].ttSuccess[game - 1] = checked;
         calculateAll();
         saveState();
     }
@@ -554,20 +490,14 @@
 
                 if (a.gender === '여' || a.gender === 'F') {
                     handiScore += femaleHandicap;
-                    if (a.ave > femaleLimit && rawScore > 0) {
-                        handiScore = Math.min(handiScore, femaleLimit);
-                    }
+                    if (a.ave > femaleLimit && rawScore > 0) handiScore = Math.min(handiScore, femaleLimit);
                 } else {
-                    if (a.ave > maleLimit && rawScore > 0) {
-                        handiScore = Math.min(handiScore, maleLimit);
-                    }
+                    if (a.ave > maleLimit && rawScore > 0) handiScore = Math.min(handiScore, maleLimit);
                 }
 
                 a['g' + g + '_calculated'] = handiScore;
                 let el = document.getElementById(`handi_${g}_${idx}`);
-                if (el) {
-                    el.innerText = rawScore > 0 ? `${handiScore}점` : '-';
-                }
+                if (el) el.innerText = rawScore > 0 ? `${handiScore}점` : '-';
             }
         });
 
@@ -587,7 +517,7 @@
                 } else {
                     summaryBox.style.display = "block";
                     summaryBox.innerHTML = `
-                        <div class="fw-bold mb-1"><i class="fas fa-flag-checkered"></i> ${g}게임 미션 달성 현황</div>
+                        <div class="fw-bold mb-1"><i class="fas fa-flag-checkered"></i> ${g}G 미션 성공 현황</div>
                         <div class="small">🎯 <strong>올카바(AC)</strong>: ${acWinners.map(a => a.name).join(', ') || '없음'} (${acWinners.length}명)</div>
                         <div class="small">🎳 <strong>텐터키(TT)</strong>: ${ttWinners.map(a => a.name).join(', ') || '없음'} (${ttWinners.length}명)</div>
                     `;
@@ -632,17 +562,63 @@
         if (settlementEl) {
             settlementEl.innerHTML = `
                 <div class="row text-start small">
-                    <div class="col-6"><strong>총 참석자:</strong> ${attendees.length}명</div>
-                    <div class="col-6"><strong>사이드 참여자:</strong> ${sideCount}명</div>
-                    <div class="col-6"><strong>게임비 총액:</strong> ${totalGameFee.toLocaleString()}원</div>
-                    <div class="col-6"><strong>팀전비 총액:</strong> ${totalTeamFee.toLocaleString()}원</div>
-                    <div class="col-12 mt-1"><strong>사이드 총 적립금:</strong> <span class="text-primary fw-bold">${totalSideFee.toLocaleString()}원</span> (게임당 ${(totalSideFee / 4).toLocaleString()}원)</div>
+                    <div class="col-6 mb-1"><strong>총 참석자:</strong> ${attendees.length}명</div>
+                    <div class="col-6 mb-1"><strong>사이드 참여:</strong> ${sideCount}명</div>
+                    <div class="col-6 mb-1"><strong>게임비 총액:</strong> ${totalGameFee.toLocaleString()}원</div>
+                    <div class="col-6 mb-1"><strong>팀전비 총액:</strong> ${totalTeamFee.toLocaleString()}원</div>
+                    <div class="col-12 mt-1"><strong>사이드 총 적립금:</strong> <span class="text-primary fw-bold">${totalSideFee.toLocaleString()}원</span></div>
                 </div>
             `;
+        }
+    }
+
+    function copyKakaoSummary() {
+        if(attendees.length === 0) { alert("정산할 데이터가 없습니다."); return; }
+
+        let rankedList = [...attendees].map(a => {
+            let total = (a.g1_calculated || 0) + (a.g2_calculated || 0) + (a.g3_calculated || 0) + (a.g4_calculated || 0);
+            return { name: a.name, total, avg: (total/4).toFixed(1) };
+        }).sort((a, b) => b.total - a.total);
+
+        let text = `🎳 [Burning crew B.C 정산 결과]\n\n`;
+        text += `🏆 최종 순위:\n`;
+        rankedList.slice(0, 3).forEach((r, i) => {
+            text += `${i+1}위: ${r.name} (${r.total}점 / Avg ${r.avg})\n`;
+        });
+        text += `\n👥 총 참석자: ${attendees.length}명\n`;
+        text += `💰 사이드 참가: ${attendees.filter(a => a.joinSide).length}명\n\n`;
+        text += `모두 수고하셨습니다!👏`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("📋 카톡 공유용 텍스트 복사 완료!");
+        }).catch(() => alert("복사에 실패했습니다."));
+    }
+
+    async function saveToGoogleSheet() {
+        let url = document.getElementById("apiUrl").value.trim();
+        if(!url) { alert("Google Apps Script API URL이 입력되지 않았습니다."); return; }
+
+        if(!confirm("⚠️ 구글 시트로 최종 정산 데이터를 전송하시겠습니까?")) return;
+
+        try {
+            let payload = {
+                action: "saveResult",
+                date: new Date().toISOString().split('T')[0],
+                attendees: attendees
+            };
+
+            let res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            showToast("☁️ 구글 시트로 성공적으로 저장되었습니다!");
+        } catch(err) {
+            alert("구글 시트 저장 중 오류가 발생했습니다.");
+            console.error(err);
         }
     }
 </script>
 </body>
 </html>
-
-```
