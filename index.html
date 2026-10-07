@@ -1,3 +1,30 @@
+요청하신 대로 **'걷을 돈' 탭에서 각 회원의 입금 여부를 직접 체크**할 수 있도록 **체크박스/버튼 체크 기능**과 **체크 시 행의 배경색이 변경되는 시각 효과**를 추가하였습니다.
+
+---
+
+### 1. 주요 변경 및 추가 내용
+
+1. **상태 관리 데이터 구조 확장**:
+* 각 참석자 객체(`attendees`)에 입금 여부를 저장하는 `isPaid: false` 필드를 추가했습니다.
+
+
+2. **'걷을 돈' 탭 입금 체크 버튼/체크박스 추가**:
+* 표 맨 오른쪽에 **'입금'** 열을 추가하여 클릭 가능한 체크박스(또는 토글)를 넣었습니다.
+* 체크 시 해당 행이 초록색 연한 배경으로 바뀌어 **누가 내고 안 냈는지 직관적으로 확인**할 수 있습니다.
+
+
+3. **로컬 스토리지 자동 저장 연동**:
+* 체크 여부가 자동으로 저장되므로 페이지를 새로고침하거나 탭을 이동해도 체크 상태가 유지됩니다.
+
+
+
+---
+
+### 2. 완성된 전체 HTML 코드 (`index.html`)
+
+아래 코드를 복사해서 기존 파일에 전체 덮어씌워 사용하시면 됩니다.
+
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -7,491 +34,49 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            height: 100%;
-            overflow-x: hidden;
-        }
-
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #f8f9fa;
-            padding-bottom: 80px;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header i {
-            margin-right: 8px;
-        }
-
-        /* 네비게이션 개선 */
-        .nav-tabs {
-            background: white;
-            border-bottom: 2px solid #e9ecef;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            position: sticky;
-            top: 60px;
-            z-index: 99;
-            gap: 0;
-        }
-
-        .nav-tabs .nav-link {
-            font-weight: 600;
-            color: #495057;
-            border: none;
-            padding: 12px 10px;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-        }
-
-        .nav-tabs .nav-link:hover {
-            color: #0d6efd;
-            background-color: #f8f9fa;
-        }
-
-        .nav-tabs .nav-link.active {
-            background-color: #0d6efd;
-            color: white;
-            border-bottom: 3px solid #0d6efd;
-        }
-
-        .card {
-            margin-top: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border: 1px solid #e9ecef;
-        }
-
-        .card-header {
-            font-weight: bold;
-            background-color: #fff;
-            border-bottom: 2px solid #0d6efd;
-            padding: 12px 15px;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .card-body {
-            padding: 12px 15px;
-        }
-
-        /* 테이블 최적화 */
-        .table {
-            font-size: 0.85rem;
-            margin-bottom: 0;
-        }
-
-        .table th, .table td {
-            text-align: center;
-            vertical-align: middle;
-            padding: 8px 4px;
-        }
-
-        .table th {
-            font-weight: 600;
-            background-color: #f8f9fa;
-            font-size: 0.75rem;
-        }
-
-        /* 모바일에서 스크롤 가능한 테이블 */
-        .table-responsive {
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .btn-custom {
-            font-weight: 600;
-            padding: 10px 15px;
-            font-size: 0.95rem;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-custom:active {
-            transform: scale(0.98);
-        }
-
-        .opt-chk {
-            transform: scale(1.2);
-            margin-right: 5px;
-            cursor: pointer;
-        }
-
-        .mission-summary-box {
-            background: linear-gradient(135deg, #f1f8ff 0%, #e3f2fd 100%);
-            border: 2px solid #b6d4fe;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 12px;
-        }
-
-        .mission-summary-box .fw-bold {
-            font-size: 0.95rem;
-        }
-
-        /* 입력창 최적화 */
-        .form-control, .form-select {
-            border-radius: 6px;
-            border: 1px solid #dee2e6;
-            padding: 8px 10px;
-            font-size: 1rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-        }
-
-        .form-check-input {
-            width: 1.3em;
-            height: 1.3em;
-            cursor: pointer;
-        }
-
-        .form-check-label {
-            cursor: pointer;
-            user-select: none;
-        }
-
-        /* 멤버 카드 개선 */
-        .member-card {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            transition: all 0.2s ease;
-        }
-
-        .member-card:active {
-            background-color: #f8f9fa;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        .member-card.checked {
-            background-color: #e7f3ff;
-            border-color: #0d6efd;
-        }
-
-        .member-info {
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-        }
-
-        .member-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            font-size: 0.8rem;
-        }
-
-        .member-option-label {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 6px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .member-option-label input {
-            cursor: pointer;
-        }
-
-        /* 점수 입력 카드 */
-        .score-input-row {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .score-input-row .name {
-            font-weight: 600;
-            min-width: 50px;
-            font-size: 0.9rem;
-        }
-
-        .score-input-row input[type="number"] {
-            width: 70px;
-            padding: 6px 8px;
-            font-size: 0.9rem;
-        }
-
-        .score-input-row .score-result {
-            flex: 1;
-            text-align: center;
-            font-weight: 600;
-            color: #0d6efd;
-            font-size: 0.9rem;
-        }
-
-        .score-input-row .mission-checks {
-            display: flex;
-            gap: 6px;
-        }
-
-        .score-input-row .mission-checks input {
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-        }
-
-        /* 배지 개선 */
-        .badge {
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        /* 플로팅 액션 버튼 */
-        .fab-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .fab {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
-            color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .fab:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
-        }
-
-        /* 결과 표 개선 */
-        .result-row {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .result-rank {
-            font-weight: 700;
-            font-size: 1.1rem;
-            width: 40px;
-            height: 40px;
-            background-color: #f8f9fa;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0d6efd;
-        }
-
-        .result-info {
-            flex: 1;
-            margin-left: 12px;
-        }
-
-        .result-info .name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .result-info .score {
-            color: #6c757d;
-            font-size: 0.85rem;
-            margin-top: 2px;
-        }
-
-        .result-score {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #0d6efd;
-            text-align: right;
-        }
-
-        /* 모달 개선 */
-        .modal-content {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
-            color: white;
-            border-radius: 12px 12px 0 0;
-            padding: 15px;
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        /* 토스트 메시지 */
-        .toast-container {
-            position: fixed;
-            bottom: 80px;
-            right: 15px;
-            z-index: 1050;
-        }
-
-        /* 동작 피드백 */
-        .action-feedback {
-            animation: slideInUp 0.3s ease;
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* 모바일 최적화 간격 */
-        @media (max-width: 576px) {
-            body {
-                padding-bottom: 100px;
-            }
-
-            .container {
-                padding: 0;
-            }
-
-            .card {
-                margin-top: 10px;
-                border-radius: 6px;
-            }
-
-            .card-header {
-                padding: 10px 12px;
-                font-size: 0.95rem;
-            }
-
-            .card-body {
-                padding: 10px 12px;
-            }
-
-            .table {
-                font-size: 0.75rem;
-            }
-
-            .table th, .table td {
-                padding: 6px 2px;
-            }
-
-            .btn-custom {
-                padding: 8px 12px;
-                font-size: 0.9rem;
-                width: 100%;
-            }
-
-            .nav-tabs .nav-link {
-                padding: 10px 8px;
-                font-size: 0.85rem;
-            }
-
-            .member-options {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .score-input-row {
-                flex-wrap: wrap;
-            }
-
-            .score-input-row input[type="number"] {
-                width: 60px;
-            }
-
-            .result-row {
-                flex-wrap: wrap;
-            }
-
-            .result-info {
-                flex: 1 0 100%;
-                margin-left: 0;
-                margin-top: 8px;
-            }
-        }
-
-        /* 태블릿 최적화 */
-        @media (min-width: 577px) and (max-width: 992px) {
-            .nav-tabs .nav-link {
-                padding: 10px 12px;
-                font-size: 0.9rem;
-            }
-
-            .member-options {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-        }
-
-        /* 로딩 상태 */
-        .loading {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: currentColor;
-            animation: pulse 1.5s infinite;
-            margin-left: 4px;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* 접근성 개선 */
-        .btn:focus, .form-control:focus, .form-check-input:focus {
-            outline: none;
-        }
-
-        label {
-            margin-bottom: 0;
-        }
+        * { -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; overflow-x: hidden; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; padding-bottom: 80px; }
+        .header { background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); padding: 15px; text-align: center; font-weight: bold; font-size: 1.5rem; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header i { margin-right: 8px; }
+        .nav-tabs { background: white; border-bottom: 2px solid #e9ecef; overflow-x: auto; -webkit-overflow-scrolling: touch; position: sticky; top: 60px; z-index: 99; gap: 0; }
+        .nav-tabs .nav-link { font-weight: 600; color: #495057; border: none; padding: 12px 10px; font-size: 0.9rem; white-space: nowrap; flex-shrink: 0; transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+        .nav-tabs .nav-link:hover { color: #0d6efd; background-color: #f8f9fa; }
+        .nav-tabs .nav-link.active { background-color: #0d6efd; color: white; border-bottom: 3px solid #0d6efd; }
+        .card { margin-top: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e9ecef; }
+        .card-header { font-weight: bold; background-color: #fff; border-bottom: 2px solid #0d6efd; padding: 12px 15px; border-radius: 10px 10px 0 0; }
+        .card-body { padding: 12px 15px; }
+        .table { font-size: 0.85rem; margin-bottom: 0; }
+        .table th, .table td { text-align: center; vertical-align: middle; padding: 8px 4px; }
+        .table th { font-weight: 600; background-color: #f8f9fa; font-size: 0.75rem; }
+        .btn-custom { font-weight: 600; padding: 10px 15px; font-size: 0.95rem; border-radius: 6px; transition: all 0.3s ease; }
+        .btn-custom:active { transform: scale(0.98); }
+        .mission-summary-box { background: linear-gradient(135deg, #f1f8ff 0%, #e3f2fd 100%); border: 2px solid #b6d4fe; border-radius: 10px; padding: 15px; margin-top: 12px; }
+        .form-control, .form-select { border-radius: 6px; border: 1px solid #dee2e6; padding: 8px 10px; font-size: 1rem; }
+        .member-card { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 10px; transition: all 0.2s ease; }
+        .member-card.checked { background-color: #e7f3ff; border-color: #0d6efd; }
+        .member-info { font-weight: 600; font-size: 0.95rem; margin-bottom: 8px; }
+        .member-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 0.8rem; }
+        .member-option-label { display: flex; align-items: center; gap: 4px; padding: 6px; background-color: #f8f9fa; border-radius: 4px; cursor: pointer; }
+        .score-input-row { background: white; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .score-input-row .name { font-weight: 600; min-width: 50px; font-size: 0.9rem; }
+        .score-input-row input[type="number"] { width: 70px; padding: 6px 8px; font-size: 0.9rem; }
+        .score-input-row .score-result { flex: 1; text-align: center; font-weight: 600; color: #0d6efd; font-size: 0.9rem; }
+        .score-input-row .mission-checks { display: flex; gap: 6px; }
+        .score-input-row .mission-checks input { cursor: pointer; width: 18px; height: 18px; }
+        .badge { padding: 4px 8px; font-size: 0.75rem; font-weight: 600; }
+        .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .fab { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4); cursor: pointer; }
+        .result-row { background: white; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .result-rank { font-weight: 700; font-size: 1.1rem; width: 40px; height: 40px; background-color: #f8f9fa; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0d6efd; }
+        .result-info { flex: 1; margin-left: 12px; }
+        .result-info .name { font-weight: 600; font-size: 0.95rem; }
+        .result-info .score { color: #6c757d; font-size: 0.85rem; margin-top: 2px; }
+        .result-score { font-weight: 700; font-size: 1.1rem; color: #0d6efd; text-align: right; }
+        
+        /* 걷을 돈 탭 입금 완료 배경 스타일 */
+        .paid-row { background-color: #d1e7dd !important; }
+        .paid-check-input { width: 20px; height: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -500,33 +85,18 @@
     <i class="fas fa-bowling-ball"></i> Burning crew B.C
 </div>
 
-<!-- 상단 탭 메뉴 -->
 <ul class="nav nav-tabs nav-justified" id="mainTab" role="tablist">
-    <li class="nav-item">
-        <button class="nav-link active" id="setting-tab" onclick="openTab('setting')"><i class="fas fa-cog"></i> 설정</button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link" id="fee-tab" onclick="openTab('fee')"><i class="fas fa-money-bill"></i> 돈</button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link" id="g1-tab" onclick="openTab('g1')">1G</button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link" id="g2-tab" onclick="openTab('g2')">2G</button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link" id="g3-tab" onclick="openTab('g3')">3G</button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link" id="g4-tab" onclick="openTab('g4')">4G</button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link" id="prize-tab" onclick="openTab('prize')"><i class="fas fa-trophy"></i> 순위</button>
-    </li>
+    <li class="nav-item"><button class="nav-link active" id="setting-tab" onclick="openTab('setting')"><i class="fas fa-cog"></i> 설정</button></li>
+    <li class="nav-item"><button class="nav-link" id="fee-tab" onclick="openTab('fee')"><i class="fas fa-money-bill"></i> 돈</button></li>
+    <li class="nav-item"><button class="nav-link" id="g1-tab" onclick="openTab('g1')">1G</button></li>
+    <li class="nav-item"><button class="nav-link" id="g2-tab" onclick="openTab('g2')">2G</button></li>
+    <li class="nav-item"><button class="nav-link" id="g3-tab" onclick="openTab('g3')">3G</button></li>
+    <li class="nav-item"><button class="nav-link" id="g4-tab" onclick="openTab('g4')">4G</button></li>
+    <li class="nav-item"><button class="nav-link" id="prize-tab" onclick="openTab('prize')"><i class="fas fa-trophy"></i> 순위</button></li>
 </ul>
 
 <div class="container-fluid">
-    <!-- 1. 설정 탭 -->https://github.com/anglephy/burning-crew-bc/blob/main/index.html
+    <!-- 1. 설정 탭 -->
     <div id="tab-setting" class="tab-content-item">
         <div class="card">
             <div class="card-header"><i class="fas fa-sliders-h"></i> 핸디 / 한도 및 기본 비용 설정</div>
@@ -588,7 +158,10 @@
     <!-- 2. 걷을돈 탭 -->
     <div id="tab-fee" class="tab-content-item" style="display:none;">
         <div class="card">
-            <div class="card-header"><i class="fas fa-receipt"></i> 걷을 돈 요약</div>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-receipt"></i> 걷을 돈 요약</span>
+                <span id="paidSummaryBadge" class="badge bg-success">입금완료: 0명</span>
+            </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-bordered mb-0">
@@ -600,10 +173,11 @@
                                 <th>사이드</th>
                                 <th>미션</th>
                                 <th>합계</th>
+                                <th>입금확인</th>
                             </tr>
                         </thead>
                         <tbody id="feeTableBody">
-                            <tr><td colspan="6" class="text-muted text-center py-3">참석자를 먼저 불러와주세요.</td></tr>
+                            <tr><td colspan="7" class="text-muted text-center py-3">참석자를 먼저 불러와주세요.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -672,7 +246,6 @@
     </div>
 </div>
 
-<!-- 플로팅 액션 버튼 -->
 <div class="fab-container">
     <button class="fab" title="초기화" onclick="resetAll()"><i class="fas fa-redo"></i></button>
     <button class="fab" title="저장" onclick="saveState()" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);"><i class="fas fa-save"></i></button>
@@ -689,7 +262,6 @@
         loadStoredState();
     };
 
-    // ===== 상태 관리 함수 =====
     function saveState() {
         let state = {
             femaleHandicap: document.getElementById("femaleHandicap").value,
@@ -711,11 +283,11 @@
             try {
                 let state = JSON.parse(savedState);
                 document.getElementById("femaleHandicap").value = state.femaleHandicap || 15;
-                document.getElementById("maleLimit").value = state.maleLimit || 250;
-                document.getElementById("femaleLimit").value = state.femaleLimit || 250;
-                document.getElementById("gameFee").value = state.gameFee || 15000;
-                document.getElementById("teamFee").value = state.teamFee || 4000;
-                document.getElementById("sideFee").value = state.sideFee || 10000;
+                document.getElementById("maleLimit").value = state.maleLimit || 210;
+                document.getElementById("femaleLimit").value = state.femaleLimit || 200;
+                document.getElementById("gameFee").value = state.gameFee || 14000;
+                document.getElementById("teamFee").value = state.teamFee || 8000;
+                document.getElementById("sideFee").value = state.sideFee || 20000;
                 attendees = state.attendees || [];
             } catch(e) {
                 console.log("저장된 상태를 불러올 수 없습니다");
@@ -751,7 +323,6 @@
         }
     }
 
-    // ===== 토스트 메시지 =====
     function showToast(message) {
         let toast = document.createElement("div");
         toast.className = "alert alert-info position-fixed bottom-0 end-0 m-3 action-feedback";
@@ -761,7 +332,6 @@
         setTimeout(() => toast.remove(), 2000);
     }
 
-    // ===== 탭 전환 =====
     function openTab(tabName) {
         let items = document.getElementsByClassName("tab-content-item");
         for (let i = 0; i < items.length; i++) items[i].style.display = "none";
@@ -771,12 +341,9 @@
 
         document.getElementById("tab-" + tabName).style.display = "block";
         document.getElementById(tabName + "-tab").classList.add("active");
-        
-        // 스크롤 상단으로
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ===== 구글 API 연동 =====
     async function fetchGoogleSheetApi() {
         let url = document.getElementById("apiUrl").value.trim();
         if(!url) {
@@ -789,7 +356,6 @@
         try {
             let res = await fetch(url);
             let data = await res.json();
-            
             let list = Array.isArray(data) ? data : (data.members || data.data || []);
 
             if(list.length > 0) {
@@ -870,11 +436,8 @@
 
     function updateMemberCard(checkbox) {
         let card = checkbox.closest(".member-card");
-        if(checkbox.checked) {
-            card.classList.add("checked");
-        } else {
-            card.classList.remove("checked");
-        }
+        if(checkbox.checked) card.classList.add("checked");
+        else card.classList.remove("checked");
     }
 
     function loadAttendees() {
@@ -900,6 +463,7 @@
                 joinSide: joinSide,
                 joinAC: joinAC,
                 joinTT: joinTT,
+                isPaid: false, // 입금 여부 기본값
                 g1: 0, g2: 0, g3: 0, g4: 0,
                 acSuccess: [false, false, false, false],
                 ttSuccess: [false, false, false, false]
@@ -924,12 +488,18 @@
         let baseTeam = parseInt(document.getElementById("teamFee").value) || 0;
         let baseSide = parseInt(document.getElementById("sideFee").value) || 0;
 
-        attendees.forEach(a => {
+        let paidCount = 0;
+
+        attendees.forEach((a, idx) => {
             let sideVal = a.joinSide ? baseSide : 0;
-            let missionVal = (a.joinAC ? 2000 : 0) + (a.joinTT ? 1000 : 0);
+            let missionVal = (a.joinAC ? 8000 : 0) + (a.joinTT ? 4000 : 0);
             let total = baseGame + baseTeam + sideVal + missionVal;
 
+            if (a.isPaid) paidCount++;
+
             let tr = document.createElement("tr");
+            if (a.isPaid) tr.className = "paid-row";
+
             tr.innerHTML = `
                 <td class="fw-bold">${a.name}</td>
                 <td>${baseGame.toLocaleString()}</td>
@@ -937,9 +507,23 @@
                 <td>${sideVal.toLocaleString()}</td>
                 <td>${missionVal.toLocaleString()}</td>
                 <td class="fw-bold text-primary">${total.toLocaleString()}원</td>
+                <td>
+                    <input type="checkbox" class="paid-check-input" ${a.isPaid ? 'checked' : ''} onchange="togglePaid(${idx}, this.checked)">
+                </td>
             `;
             tbody.appendChild(tr);
         });
+
+        let paidBadge = document.getElementById("paidSummaryBadge");
+        if (paidBadge) {
+            paidBadge.innerText = `입금완료: ${paidCount} / ${attendees.length}명`;
+        }
+    }
+
+    function togglePaid(idx, checked) {
+        attendees[idx].isPaid = checked;
+        saveState();
+        renderFeeTable();
     }
 
     function renderGameTables() {
@@ -976,131 +560,116 @@
     }
 
     function updateMission(idx, game, type, checked) {
-        if(type === 'ac') attendees[idx].acSuccess[game - 1] = checked;
-        if(type === 'tt') attendees[idx].ttSuccess[game - 1] = checked;
+        if (type === 'ac') {
+            attendees[idx].acSuccess[game - 1] = checked;
+        } else if (type === 'tt') {
+            attendees[idx].ttSuccess[game - 1] = checked;
+        }
         calculateAll();
         saveState();
     }
 
     function calculateAll() {
-        let fHandi = parseInt(document.getElementById("femaleHandicap").value) || 0;
-        let mLimit = parseInt(document.getElementById("maleLimit").value) || 0;
-        let fLimit = parseInt(document.getElementById("femaleLimit").value) || 0;
-
-        let results = [];
-        let totalACParticipants = attendees.filter(a => a.joinAC).length;
-        let totalTTParticipants = attendees.filter(a => a.joinTT).length;
+        let femaleHandicap = parseInt(document.getElementById("femaleHandicap").value) || 0;
+        let maleLimit = parseInt(document.getElementById("maleLimit").value) || 210;
+        let femaleLimit = parseInt(document.getElementById("femaleLimit").value) || 200;
 
         attendees.forEach((a, idx) => {
-            let total = 0;
-            for(let g = 1; g <= 4; g++) {
-                let rawScore = a['g' + g];
-                let isFemale = (a.gender === '여' || a.gender === 'F');
-                let handiTd = document.getElementById(`handi_${g}_${idx}`);
-                
-                if(rawScore > 0) {
-                    let handi = isFemale ? fHandi : 0;
-                    let calculatedScore = rawScore + handi;
-                    let limit = isFemale ? fLimit : mLimit;
-                    
-                    if(calculatedScore > limit) calculatedScore = limit;
+            for (let g = 1; g <= 4; g++) {
+                let rawScore = a['g' + g] || 0;
+                let handiScore = rawScore;
 
-                    if(handiTd) {
-                        if(isFemale && handi > 0) {
-                            handiTd.innerHTML = `${calculatedScore} <small>(+${handi})</small>`;
-                        } else {
-                            handiTd.innerText = calculatedScore;
-                        }
+                if (a.gender === '여' || a.gender === 'F') {
+                    handiScore += femaleHandicap;
+                    if (a.ave > femaleLimit && rawScore > 0) {
+                        handiScore = Math.min(handiScore, femaleLimit);
                     }
-                    total += calculatedScore;
                 } else {
-                    if(handiTd) handiTd.innerText = "-";
+                    if (a.ave > maleLimit && rawScore > 0) {
+                        handiScore = Math.min(handiScore, maleLimit);
+                    }
+                }
+
+                a['g' + g + '_calculated'] = handiScore;
+                let el = document.getElementById(`handi_${g}_${idx}`);
+                if (el) {
+                    el.innerText = rawScore > 0 ? `${handiScore}점` : '-';
                 }
             }
-            results.push({ name: a.name, total: total });
         });
 
-        // 미션 정리
-        for(let g = 1; g <= 4; g++) {
-            let acWinners = attendees.filter(a => a.joinAC && a.acSuccess[g-1]);
-            let ttWinners = attendees.filter(a => a.joinTT && a.ttSuccess[g-1]);
+        renderMissionSummaries();
+        renderPrizeTable();
+    }
 
-            let acTotalPool = totalACParticipants * 500;
-            let ttTotalPool = totalTTParticipants * 250;
-
-            let acPerPerson = acWinners.length > 0 ? Math.floor(acTotalPool / acWinners.length) : 0;
-            let ttPerPerson = ttWinners.length > 0 ? Math.floor(ttTotalPool / ttWinners.length) : 0;
+    function renderMissionSummaries() {
+        for (let g = 1; g <= 4; g++) {
+            let acWinners = attendees.filter(a => a.acSuccess[g - 1]);
+            let ttWinners = attendees.filter(a => a.ttSuccess[g - 1]);
 
             let summaryBox = document.getElementById(`g${g}MissionSummary`);
-            if(summaryBox) {
-                if(acWinners.length === 0 && ttWinners.length === 0) {
+            if (summaryBox) {
+                if (acWinners.length === 0 && ttWinners.length === 0) {
                     summaryBox.style.display = "none";
                 } else {
                     summaryBox.style.display = "block";
                     summaryBox.innerHTML = `
-                        <div class="fw-bold mb-2">💰 ${g}게임 미션</div>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="p-2 bg-white border rounded text-center">
-                                    <div class="text-success fw-bold small">🎯 올카바</div>
-                                    <div class="small">${acWinners.length > 0 ? acWinners.map(w => w.name).join(', ') : '-'}</div>
-                                    <div class="text-primary fw-bold small mt-1">${acWinners.length > 0 ? acPerPerson.toLocaleString() + '원' : '-'}</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-2 bg-white border rounded text-center">
-                                    <div class="text-warning fw-bold small">🔥 텐터키</div>
-                                    <div class="small">${ttWinners.length > 0 ? ttWinners.map(w => w.name).join(', ') : '-'}</div>
-                                    <div class="text-primary fw-bold small mt-1">${ttWinners.length > 0 ? ttPerPerson.toLocaleString() + '원' : '-'}</div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="fw-bold mb-1"><i class="fas fa-flag-checkered"></i> ${g}게임 미션 달성 현황</div>
+                        <div class="small">🎯 <strong>올카바(AC)</strong>: ${acWinners.map(a => a.name).join(', ') || '없음'} (${acWinners.length}명)</div>
+                        <div class="small">🎳 <strong>텐터키(TT)</strong>: ${ttWinners.map(a => a.name).join(', ') || '없음'} (${ttWinners.length}명)</div>
                     `;
                 }
             }
         }
+    }
 
-        // 순위 계산
-        results.sort((a, b) => b.total - a.total);
+    function renderPrizeTable() {
+        let prizeContainer = document.getElementById("prizeTableBody");
+        if (!prizeContainer) return;
 
-        let prizeBody = document.getElementById("prizeTableBody");
-        if(prizeBody) {
-            prizeBody.innerHTML = "";
-            if(results.every(r => r.total === 0)) {
-                prizeBody.innerHTML = '<div class="text-muted text-center py-3">점수를 입력하면 자동으로 순위가 계산됩니다.</div>';
-            } else {
-                results.forEach((r, i) => {
-                    let div = document.createElement("div");
-                    div.className = "result-row";
-                    let medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '  ';
-                    div.innerHTML = `
-                        <div class="result-rank">${medal} ${i + 1}</div>
-                        <div class="result-info">
-                            <div class="name">${r.name}</div>
-                            <div class="score">${r.total}점</div>
-                        </div>
-                        <div class="result-score">${r.total}</div>
-                    `;
-                    prizeBody.appendChild(div);
-                });
-            }
-        }
+        let rankedList = [...attendees].map(a => {
+            let total = (a.g1_calculated || 0) + (a.g2_calculated || 0) + (a.g3_calculated || 0) + (a.g4_calculated || 0);
+            let avg = (total / 4).toFixed(1);
+            return { ...a, total, avg };
+        });
 
-        // 정산 요약
-        let settlementSummary = document.getElementById("settlementSummary");
-        if(settlementSummary) {
-            let totalPlayers = attendees.length;
-            let totalScore = results.reduce((sum, r) => sum + r.total, 0);
-            if(totalPlayers > 0) {
-                let avgScore = Math.round(totalScore / totalPlayers);
-                settlementSummary.innerHTML = `
-                    <div><strong>참석자:</strong> ${totalPlayers}명</div>
-                    <div><strong>총점:</strong> ${totalScore}점</div>
-                    <div><strong>평균:</strong> ${avgScore}점</div>
-                `;
-            }
+        rankedList.sort((a, b) => b.total - a.total);
+
+        prizeContainer.innerHTML = "";
+        rankedList.forEach((a, idx) => {
+            let div = document.createElement("div");
+            div.className = "result-row";
+            div.innerHTML = `
+                <div class="result-rank">${idx + 1}</div>
+                <div class="result-info">
+                    <div class="name">${a.name} <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${a.gender}</span></div>
+                    <div class="score">평균 ${a.avg}점 (1G: ${a.g1_calculated||0} / 2G: ${a.g2_calculated||0} / 3G: ${a.g3_calculated||0} / 4G: ${a.g4_calculated||0})</div>
+                </div>
+                <div class="result-score">${a.total}점</div>
+            `;
+            prizeContainer.appendChild(div);
+        });
+
+        let totalGameFee = attendees.length * (parseInt(document.getElementById("gameFee").value) || 0);
+        let totalTeamFee = attendees.length * (parseInt(document.getElementById("teamFee").value) || 0);
+        let sideCount = attendees.filter(a => a.joinSide).length;
+        let totalSideFee = sideCount * (parseInt(document.getElementById("sideFee").value) || 0);
+
+        let settlementEl = document.getElementById("settlementSummary");
+        if (settlementEl) {
+            settlementEl.innerHTML = `
+                <div class="row text-start small">
+                    <div class="col-6"><strong>총 참석자:</strong> ${attendees.length}명</div>
+                    <div class="col-6"><strong>사이드 참여자:</strong> ${sideCount}명</div>
+                    <div class="col-6"><strong>게임비 총액:</strong> ${totalGameFee.toLocaleString()}원</div>
+                    <div class="col-6"><strong>팀전비 총액:</strong> ${totalTeamFee.toLocaleString()}원</div>
+                    <div class="col-12 mt-1"><strong>사이드 총 적립금:</strong> <span class="text-primary fw-bold">${totalSideFee.toLocaleString()}원</span> (게임당 ${(totalSideFee / 4).toLocaleString()}원)</div>
+                </div>
+            `;
         }
     }
 </script>
 </body>
 </html>
+
+```
