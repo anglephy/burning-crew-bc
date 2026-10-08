@@ -675,14 +675,14 @@
         }).catch(() => alert("복사에 실패했습니다."));
     }
 
-    async function saveToGoogleSheet() {
+  async function saveToGoogleSheet() {
   const scriptUrl = document.getElementById('scriptUrl')?.value?.trim();
   if (!scriptUrl) {
     alert("⚠️ 구글 앱스 스크립트 API URL이 입력되지 않았습니다.");
     return;
   }
 
-  // 1. 참석 체크된 회원 가져오기
+  // 1. 참석 체크된 회원만 필터링
   const attendingMembers = members.filter(m => m.isAttending);
   
   if (attendingMembers.length === 0) {
@@ -690,35 +690,35 @@
     return;
   }
 
-  // 2. 점수 누락 여부 검사
+  // 2. 점수 누락 및 잘못된 값 검사
   const incompleteMembers = [];
 
   attendingMembers.forEach(m => {
     const missingGames = [];
     for (let i = 0; i < 4; i++) {
+      // 점수가 없거나, 빈 문자열이거나, 숫자가 아닌(NaN) 경우 체크
       const score = m.scores ? m.scores[i] : null;
-      // 점수가 비어있거나, null, 또는 숫자가 아닌 경우
-      if (score === null || score === undefined || score === '' || isNaN(score)) {
+      if (score === null || score === undefined || String(score).trim() === '' || isNaN(score)) {
         missingGames.push(`${i + 1}게임`);
       }
     }
 
     if (missingGames.length > 0) {
-      incompleteMembers.push(`• ${m.name} (${missingGames.join(', ')} 누락)`);
+      incompleteMembers.push(`• ${m.name}: [ ${missingGames.join(', ')} ] 점수 누락`);
     }
   });
 
-  // 3. 점수가 누락된 회원이 있다면 저장 중단 후 알림 팝업
+  // 3. 점수가 누락된 회원이 있다면 상세 알림을 띄우고 저장 차단
   if (incompleteMembers.length > 0) {
     alert(
       "⚠️ 아래 회원의 게임 점수가 누락되었습니다!\n" +
-      "점수를 모두 입력한 후 다시 저장해 주세요.\n\n" +
+      "점수를 입력하신 후 다시 저장해 주세요.\n\n" +
       incompleteMembers.join("\n")
     );
-    return; // 저장을 진행하지 않고 함수 종료
+    return; // 저장을 진행하지 않고 중단
   }
 
-  // 4. 점수가 모두 정상 입력된 경우 구글 시트로 저장 진행
+  // 4. 모든 점수가 입력된 경우에만 구글 시트로 안전하게 전송
   try {
     await fetch(scriptUrl, {
       method: 'POST',
@@ -726,7 +726,7 @@
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ attendees: attendingMembers })
     });
-    alert("☁️ 구글 시트로 최종 누적 저장을 요청했습니다!\n(구글 시트를 확인해 보세요)");
+    alert("☁️ 구글 시트로 최종 저장이 완료되었습니다!");
   } catch (e) {
     alert("구글 시트 저장 중 오류가 발생했습니다: " + e.message);
   }
