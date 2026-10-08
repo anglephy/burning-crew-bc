@@ -676,30 +676,61 @@
     }
 
     async function saveToGoogleSheet() {
-        let url = document.getElementById("apiUrl").value.trim();
-        if(!url) { alert("Google Apps Script API URL이 입력되지 않았습니다."); return; }
+  const scriptUrl = document.getElementById('scriptUrl')?.value?.trim();
+  if (!scriptUrl) {
+    alert("⚠️ 구글 앱스 스크립트 API URL이 입력되지 않았습니다.");
+    return;
+  }
 
-        if(!confirm("⚠️ 구글 시트로 최종 정산 데이터를 전송하시겠습니까?")) return;
+  // 1. 참석 체크된 회원 가져오기
+  const attendingMembers = members.filter(m => m.isAttending);
+  
+  if (attendingMembers.length === 0) {
+    alert("⚠️ 참석 체크된 회원이 없습니다. 명단을 확인해 주세요.");
+    return;
+  }
 
-        try {
-            let payload = {
-                action: "saveResult",
-                date: new Date().toISOString().split('T')[0],
-                attendees: attendees
-            };
+  // 2. 점수 누락 여부 검사
+  const incompleteMembers = [];
 
-            let res = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            showToast("☁️ 구글 시트로 성공적으로 저장되었습니다!");
-        } catch(err) {
-            alert("구글 시트 저장 중 오류가 발생했습니다.");
-            console.error(err);
-        }
+  attendingMembers.forEach(m => {
+    const missingGames = [];
+    for (let i = 0; i < 4; i++) {
+      const score = m.scores ? m.scores[i] : null;
+      // 점수가 비어있거나, null, 또는 숫자가 아닌 경우
+      if (score === null || score === undefined || score === '' || isNaN(score)) {
+        missingGames.push(`${i + 1}게임`);
+      }
     }
+
+    if (missingGames.length > 0) {
+      incompleteMembers.push(`• ${m.name} (${missingGames.join(', ')} 누락)`);
+    }
+  });
+
+  // 3. 점수가 누락된 회원이 있다면 저장 중단 후 알림 팝업
+  if (incompleteMembers.length > 0) {
+    alert(
+      "⚠️ 아래 회원의 게임 점수가 누락되었습니다!\n" +
+      "점수를 모두 입력한 후 다시 저장해 주세요.\n\n" +
+      incompleteMembers.join("\n")
+    );
+    return; // 저장을 진행하지 않고 함수 종료
+  }
+
+  // 4. 점수가 모두 정상 입력된 경우 구글 시트로 저장 진행
+  try {
+    await fetch(scriptUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ attendees: attendingMembers })
+    });
+    alert("☁️ 구글 시트로 최종 누적 저장을 요청했습니다!\n(구글 시트를 확인해 보세요)");
+  } catch (e) {
+    alert("구글 시트 저장 중 오류가 발생했습니다: " + e.message);
+  }
+}
 </script>
 </body>
 </html>
