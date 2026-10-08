@@ -675,50 +675,55 @@
         }).catch(() => alert("복사에 실패했습니다."));
     }
 
-  async function saveToGoogleSheet() {
-  const scriptUrl = document.getElementById('scriptUrl')?.value?.trim();
-  if (!scriptUrl) {
-    alert("⚠️ 구글 앱스 스크립트 API URL이 입력되지 않았습니다.");
-    return;
-  }
+ async function saveToGoogleSheet() {
+  // 1. URL 변수 차단: 입력창이 비어있으면 기본 주소 자동 적용
+  const defaultUrl = "https://script.google.com/macros/s/AKfycbxNbUtW9xtZTYgXJiXeUpyV8KbEvB9Iu27GvFNd0CTa9aSKSq_VNIA0m5iJ2RwTR_pi-w/exec";
+  const inputUrl = document.getElementById('scriptUrl')?.value?.trim();
+  const scriptUrl = inputUrl || defaultUrl;
 
-  // 1. 참석 체크된 회원만 필터링
+  // 2. 참석자 검사
   const attendingMembers = members.filter(m => m.isAttending);
-  
   if (attendingMembers.length === 0) {
     alert("⚠️ 참석 체크된 회원이 없습니다. 명단을 확인해 주세요.");
     return;
   }
 
-  // 2. 점수 누락 및 잘못된 값 검사
+  // 3. 점수 누락 유효성 검사 (모든 변수 차단)
   const incompleteMembers = [];
 
   attendingMembers.forEach(m => {
     const missingGames = [];
     for (let i = 0; i < 4; i++) {
-      // 점수가 없거나, 빈 문자열이거나, 숫자가 아닌(NaN) 경우 체크
       const score = m.scores ? m.scores[i] : null;
-      if (score === null || score === undefined || String(score).trim() === '' || isNaN(score)) {
-        missingGames.push(`${i + 1}게임`);
+      // 점수가 없거나, 빈칸이거나, 숫자 범위를 벗어난 경우 (0~300점 체크)
+      if (
+        score === null || 
+        score === undefined || 
+        String(score).trim() === '' || 
+        isNaN(score) ||
+        Number(score) < 0 ||
+        Number(score) > 300
+      ) {
+        missingGames.push(`${i + 1}G`);
       }
     }
 
     if (missingGames.length > 0) {
-      incompleteMembers.push(`• ${m.name}: [ ${missingGames.join(', ')} ] 점수 누락`);
+      incompleteMembers.push(`• ${m.name}: [ ${missingGames.join(', ')} ] 점수 미입력`);
     }
   });
 
-  // 3. 점수가 누락된 회원이 있다면 상세 알림을 띄우고 저장 차단
+  // 4. 누락된 점수가 있는 경우 저장 전 즉시 차단
   if (incompleteMembers.length > 0) {
     alert(
-      "⚠️ 아래 회원의 게임 점수가 누락되었습니다!\n" +
-      "점수를 입력하신 후 다시 저장해 주세요.\n\n" +
+      "⚠️ 아래 회원의 게임 점수가 입력되지 않았습니다!\n" +
+      "점수를 확인하신 후 다시 저장해 주세요.\n\n" +
       incompleteMembers.join("\n")
     );
-    return; // 저장을 진행하지 않고 중단
+    return; // 전송 차단
   }
 
-  // 4. 모든 점수가 입력된 경우에만 구글 시트로 안전하게 전송
+  // 5. 검증 완료 후 구글 시트 안전 전송
   try {
     await fetch(scriptUrl, {
       method: 'POST',
@@ -726,9 +731,9 @@
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ attendees: attendingMembers })
     });
-    alert("☁️ 구글 시트로 최종 저장이 완료되었습니다!");
+    alert("☁️ 모든 유효성 검사를 통과하여 구글 시트로 최종 저장을 완료했습니다!");
   } catch (e) {
-    alert("구글 시트 저장 중 오류가 발생했습니다: " + e.message);
+    alert("구글 시트 저장 처리 중 통신 오류가 발생했습니다: " + e.message);
   }
 }
 </script>
