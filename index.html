@@ -129,10 +129,11 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 <div id="tab-fee" class="tab-content-item" style="display:none;">
 <div class="card">
 <div class="card-header d-flex justify-content-between align-items-center">
-<span><i class="fas fa-receipt"></i> 걷을 돈 요약 (초기 입금액)</span>
+<span><i class="fas fa-receipt"></i> 걷을 돈 요약 및 항목별 총액</span>
 <span id="paidSummaryBadge" class="badge bg-success">입금완료: 0명</span>
 </div>
-<div class="card-body p-0">
+<div class="card-body p-2">
+<div id="feeCategorySummary" class="alert alert-primary p-2 mb-2 small" style="line-height: 1.5;"></div>
 <div class="table-responsive">
 <table class="table table-bordered mb-0">
 <thead class="bg-light">
@@ -141,8 +142,8 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 <th>게임비</th>
 <th>팀전</th>
 <th>사이드</th>
-<th>미션</th>
-<th>합계</th>
+<th>미션(AC/TT)</th>
+<th>총 입금액</th>
 <th>입금</th>
 </tr>
 </thead>
@@ -199,7 +200,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 <script>
 let membersDB = [];
 let attendees = [];
-const STORAGE_KEY = "burning_crew_state_v4";
+const STORAGE_KEY = "burning_crew_state_v5";
 const API_URL_KEY = "burning_api_url";
 const MEMBER_DB_KEY = "burning_members";
 
@@ -394,7 +395,8 @@ openTab('fee');
 
 function renderFeeTable() {
 let tbody = document.getElementById("feeTableBody");
-if (!tbody) return;
+let summaryEl = document.getElementById("feeCategorySummary");
+if (!tbody || !summaryEl) return;
 tbody.innerHTML = "";
 
 let baseGame = parseInt(document.getElementById("gameFee").value) || 0;
@@ -402,17 +404,32 @@ let baseTeam = parseInt(document.getElementById("teamFee").value) || 0;
 let baseSide = parseInt(document.getElementById("sideFee").value) || 0;
 
 let paidCount = 0;
+let totalGameSum = 0;
+let totalTeamSum = 0;
+let totalSideSum = 0;
+let totalACSum = 0;
+let totalTTSum = 0;
+
 attendees.forEach((a, idx) => {
 let sideVal = a.joinSide ? baseSide : 0;
-let acFee = a.joinAC ? 8000 : 0; // 올카바 총 8,000원 (2천원x4G)
-let ttFee = a.joinTT ? 4000 : 0; // 텐터키 총 4,000원 (1천원x4G)
+let acFee = a.joinAC ? 8000 : 0; // 올카바 총 8,000원 (2,000원x4G)
+let ttFee = a.joinTT ? 4000 : 0; // 텐터키 총 4,000원 (1,000원x4G)
 
-// 4게임 미성공 환불 처리된 경우 0원 처리
-if (a.acRefund) acFee = 0;
-if (a.ttRefund) ttFee = 0;
+// 4게임 종료 후 환불 조건 체크 (아직 4게임 점수가 안 끝났거나 성공자가 있으면 환불 안 함)
+let isAll4GamesFinished = attendees.length > 0 && attendees.every(item => item.g4 !== undefined && item.g4 !== '' && item.g4 > 0);
+if (isAll4GamesFinished) {
+    if (a.acRefund) acFee = 0;
+    if (a.ttRefund) ttFee = 0;
+}
 
 let missionVal = acFee + ttFee;
 let total = baseGame + baseTeam + sideVal + missionVal;
+
+totalGameSum += baseGame;
+totalTeamSum += baseTeam;
+totalSideSum += sideVal;
+if(!a.acRefund) totalACSum += (a.joinAC ? 8000 : 0);
+if(!a.ttRefund) totalTTSum += (a.joinTT ? 4000 : 0);
 
 if (a.isPaid) paidCount++;
 
@@ -424,12 +441,20 @@ tr.innerHTML = `
                 <td>${baseGame.toLocaleString()}</td>
                 <td>${baseTeam.toLocaleString()}</td>
                 <td>${sideVal.toLocaleString()}</td>
-                <td>${missionVal.toLocaleString()}${ (a.acRefund || a.ttRefund) ? '<br><small class="text-danger">(환불됨)</small>' : '' }</td>
+                <td>${missionVal.toLocaleString()}${ (a.acRefund || a.ttRefund) ? '<br><small class="text-danger">(환불)</small>' : '' }</td>
                 <td class="fw-bold text-primary">${total.toLocaleString()}원</td>
                 <td><input type="checkbox" class="paid-check-input" ${a.isPaid ? 'checked' : ''} onchange="togglePaid(${idx}, this.checked)"></td>
             `;
 tbody.appendChild(tr);
 });
+
+let grandTotal = totalGameSum + totalTeamSum + totalSideSum + totalACSum + totalTTSum;
+summaryEl.innerHTML = `
+    <b>📊 항목별 총 걷을 금액 요약</b><br>
+    • 게임비 총액: ${totalGameSum.toLocaleString()}원 | 팀전비 총액: ${totalTeamSum.toLocaleString()}원<br>
+    • 사이드 총액: ${totalSideSum.toLocaleString()}원 | 올카바 총액: ${totalACSum.toLocaleString()}원 | 텐터키 총액: ${totalTTSum.toLocaleString()}원<br>
+    • <b>전체 걷을 총 현금: <span class="text-primary">${grandTotal.toLocaleString()}원</span></b>
+`;
 
 let paidBadge = document.getElementById("paidSummaryBadge");
 if (paidBadge) paidBadge.innerText = `입금완료: ${paidCount} / ${attendees.length}명`;
@@ -512,7 +537,7 @@ a.acRefund = false;
 a.ttRefund = false;
 });
 
-// 올카바(AC) 이월 및 1/N 정산 로직
+// 올카바(AC) 이월 및 정산 로직 (참가비 게임당 2,000원)
 let acCarryOver = 0;
 let acAnyWinnerIn4Games = false;
 let acGameDetails = [];
@@ -538,7 +563,7 @@ if (isAll4GamesFinished && !acAnyWinnerIn4Games) {
 attendees.forEach(a => { if(a.joinAC) a.acRefund = true; });
 }
 
-// 텐터키(TT) 이월 및 1/N 정산 로직
+// 텐터키(TT) 이월 및 정산 로직 (참가비 게임당 1,000원)
 let ttCarryOver = 0;
 let ttAnyWinnerIn4Games = false;
 let ttGameDetails = [];
@@ -597,7 +622,6 @@ function renderPrizeTable() {
 let prizeContainer = document.getElementById("prizeTableBody");
 if (!prizeContainer) return;
 
-// 게임별 1~3위 파악을 위한 데이터 구성
 let gameRankings = [];
 for(let g=1; g<=4; g++) {
 let sorted = [...attendees]
@@ -617,7 +641,6 @@ return { ...a, total, avg, totalMissionPrize };
 rankedList.sort((a, b) => b.total - a.total);
 
 let html = "";
-// 1. 게임별 1~3위 섹션 먼저 표시
 for(let g=1; g<=4; g++) {
 let ranks = gameRankings[g-1];
 html += `<div class="mb-3 p-2 bg-light border rounded"><div class="fw-bold small text-primary mb-1">📌 ${g}게임 1~3위 현황</div>`;
@@ -634,7 +657,6 @@ html += `</div>`;
 html += `</div>`;
 }
 
-// 2. 최종 순위 및 상금 섹션 표시
 html += `<hr><div class="fw-bold mb-2">🏆 최종 합산 순위</div>`;
 rankedList.forEach((a, idx) => {
 html += `
