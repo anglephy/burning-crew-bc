@@ -2,52 +2,36 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Burning crew B.C</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-* { -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow-x: hidden; }
-body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; padding-bottom: 90px; }
-.header { background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); padding: 15px; text-align: center; font-weight: bold; font-size: 1.4rem; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-.header i { margin-right: 8px; }
-.nav-tabs { background: white; border-bottom: 2px solid #e9ecef; overflow-x: auto; -webkit-overflow-scrolling: touch; position: sticky; top: 57px; z-index: 99; gap: 0; display: flex; flex-wrap: nowrap; }
-.nav-tabs .nav-link { font-weight: 600; color: #495057; border: none; padding: 12px 12px; font-size: 0.9rem; white-space: nowrap; flex-shrink: 0; transition: all 0.2s ease; border-bottom: 3px solid transparent; }
-.nav-tabs .nav-link.active { background-color: #0d6efd; color: white; border-bottom: 3px solid #0d6efd; }
-.card { margin-top: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e9ecef; }
-.card-header { font-weight: bold; background-color: #fff; border-bottom: 2px solid #0d6efd; padding: 12px 15px; border-radius: 10px 10px 0 0; }
-.card-body { padding: 12px 15px; }
-.table { font-size: 0.85rem; margin-bottom: 0; }
-.table th, .table td { text-align: center; vertical-align: middle; padding: 8px 4px; }
-.table th { font-weight: 600; background-color: #f8f9fa; font-size: 0.75rem; }
-.btn-custom { font-weight: 600; padding: 10px 15px; font-size: 0.95rem; border-radius: 6px; }
-.mission-summary-box { background: linear-gradient(135deg, #f1f8ff 0%, #e3f2fd 100%); border: 2px solid #b6d4fe; border-radius: 10px; padding: 12px; margin-top: 12px; }
-.form-control, .form-select { border-radius: 6px; border: 1px solid #dee2e6; padding: 8px 10px; font-size: 0.95rem; }
-.member-card { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; padding-bottom: 90px; margin: 0; }
+.header { background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); padding: 12px; text-align: center; font-weight: bold; font-size: 1.2rem; color: white; position: sticky; top: 0; z-index: 100; }
+.nav-tabs { background: white; border-bottom: 2px solid #dee2e6; display: flex; overflow-x: auto; flex-wrap: nowrap; position: sticky; top: 50px; z-index: 99; -webkit-overflow-scrolling: touch; }
+.nav-tabs .nav-link { font-weight: 600; color: #495057; border: none; padding: 10px 12px; font-size: 0.85rem; white-space: nowrap; flex-shrink: 0; }
+.nav-tabs .nav-link.active { background-color: #0d6efd !important; color: white !important; border-bottom: 3px solid #004085; }
+.tab-content-item { display: none; padding: 10px; }
+.tab-content-item.active-tab { display: block !important; }
+.card { margin-top: 10px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #dee2e6; background: #fff; }
+.card-header { font-weight: bold; background-color: #fff; border-bottom: 2px solid #0d6efd; padding: 10px 12px; font-size: 0.95rem; }
+.card-body { padding: 10px 12px; }
+.table { font-size: 0.8rem; margin-bottom: 0; }
+.table th, .table td { text-align: center; vertical-align: middle; padding: 6px 3px; }
+.table th { font-weight: 600; background-color: #f8f9fa; font-size: 0.7rem; }
+.member-card { background: white; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
 .member-card.checked { background-color: #e7f3ff; border-color: #0d6efd; }
-.member-info { font-weight: 600; font-size: 0.95rem; margin-bottom: 8px; }
-.member-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 0.8rem; }
-.member-option-label { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 4px; background-color: #f8f9fa; border-radius: 6px; cursor: pointer; border: 1px solid #e9ecef; }
-.score-input-row { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.score-input-row .name-area { display: flex; flex-direction: column; min-width: 65px; }
-.score-input-row .name { font-weight: 700; font-size: 0.9rem; }
-.score-input-row input[type="number"] { width: 75px; text-align: center; font-weight: bold; font-size: 1.05rem; }
-.score-input-row .score-result { min-width: 60px; text-align: center; font-weight: 700; color: #0d6efd; font-size: 0.95rem; }
-.score-input-row .mission-checks { display: flex; gap: 8px; }
-.score-input-row .mission-checks label { display: flex; align-items: center; gap: 2px; font-size: 0.75rem; font-weight: bold; background: #f8f9fa; padding: 4px 6px; border-radius: 4px; border: 1px solid #dee2e6; }
-.score-input-row .mission-checks input { width: 18px; height: 18px; cursor: pointer; }
-.badge { padding: 4px 6px; font-size: 0.7rem; font-weight: 600; }
-.fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-.fab { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%); color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4); cursor: pointer; }
-.result-row { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-.result-rank { font-weight: 800; font-size: 1.1rem; width: 36px; height: 36px; background-color: #f8f9fa; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0d6efd; }
-.result-info { flex: 1; margin-left: 10px; }
-.result-info .name { font-weight: 700; font-size: 0.95rem; }
-.result-info .score { color: #6c757d; font-size: 0.8rem; margin-top: 2px; }
-.result-score { font-weight: 800; font-size: 1.1rem; color: #0d6efd; text-align: right; }
+.member-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; font-size: 0.75rem; margin-top: 6px; }
+.member-option-label { display: flex; align-items: center; justify-content: center; gap: 2px; padding: 6px 2px; background-color: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6; cursor: pointer; }
+.score-input-row { background: white; border: 1px solid #dee2e6; border-radius: 6px; padding: 8px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.score-input-row input[type="number"] { width: 65px; text-align: center; font-weight: bold; font-size: 1rem; }
+.mission-summary-box { background: #e3f2fd; border: 1px solid #b6d4fe; border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 0.85rem; line-height: 1.4; }
 .paid-row { background-color: #e8f5e9 !important; }
-.paid-check-input { width: 22px; height: 22px; cursor: pointer; }
+.paid-check-input { width: 20px; height: 20px; cursor: pointer; }
+.fab-container { position: fixed; bottom: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+.fab { width: 48px; height: 48px; border-radius: 50%; background: #0d6efd; color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 3px 8px rgba(0,0,0,0.3); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -66,71 +50,50 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 <li class="nav-item"><button class="nav-link" id="prize-tab" onclick="openTab('prize')"><i class="fas fa-trophy"></i> 순위</button></li>
 </ul>
 
-<div class="container-fluid">
+<div class="container-fluid px-2">
 <!-- 1. 설정 탭 -->
-<div id="tab-setting" class="tab-content-item">
+<div id="tab-setting" class="tab-content-item active-tab">
 <div class="card">
 <div class="card-header"><i class="fas fa-sliders-h"></i> 핸디 및 기본 비용 설정</div>
 <div class="card-body">
 <div class="row g-2">
-<div class="col-6 col-md-4">
-<label class="form-label fw-bold small">여성 핸디</label>
-<input type="number" inputmode="numeric" id="femaleHandicap" class="form-control form-control-sm" value="15" onchange="calculateAll()">
-</div>
-<div class="col-6 col-md-4">
-<label class="form-label fw-bold small">남성 한도</label>
-<input type="number" inputmode="numeric" id="maleLimit" class="form-control form-control-sm" value="210" onchange="calculateAll()">
-</div>
-<div class="col-6 col-md-4">
-<label class="form-label fw-bold small">여성 한도</label>
-<input type="number" inputmode="numeric" id="femaleLimit" class="form-control form-control-sm" value="200" onchange="calculateAll()">
-</div>
-<div class="col-6 col-md-4">
-<label class="form-label fw-bold small">게임비</label>
-<input type="number" inputmode="numeric" id="gameFee" class="form-control form-control-sm" value="14000" onchange="renderFeeTable()">
-</div>
-<div class="col-6 col-md-4">
-<label class="form-label fw-bold small">팀전비</label>
-<input type="number" inputmode="numeric" id="teamFee" class="form-control form-control-sm" value="8000" onchange="renderFeeTable()">
-</div>
-<div class="col-6 col-md-4">
-<label class="form-label fw-bold small">개인사이드</label>
-<input type="number" inputmode="numeric" id="sideFee" class="form-control form-control-sm" value="20000" onchange="renderFeeTable()">
-</div>
+<div class="col-4"><label class="form-label fw-bold small">여성핸디</label><input type="number" inputmode="numeric" id="femaleHandicap" class="form-control form-control-sm" value="15" onchange="calculateAll()"></div>
+<div class="col-4"><label class="form-label fw-bold small">남성한도</label><input type="number" inputmode="numeric" id="maleLimit" class="form-control form-control-sm" value="210" onchange="calculateAll()"></div>
+<div class="col-4"><label class="form-label fw-bold small">여성한도</label><input type="number" inputmode="numeric" id="femaleLimit" class="form-control form-control-sm" value="200" onchange="calculateAll()"></div>
+<div class="col-4"><label class="form-label fw-bold small">게임비</label><input type="number" inputmode="numeric" id="gameFee" class="form-control form-control-sm" value="14000" onchange="renderFeeTable()"></div>
+<div class="col-4"><label class="form-label fw-bold small">팀전비</label><input type="number" inputmode="numeric" id="teamFee" class="form-control form-control-sm" value="8000" onchange="renderFeeTable()"></div>
+<div class="col-4"><label class="form-label fw-bold small">사이드</label><input type="number" inputmode="numeric" id="sideFee" class="form-control form-control-sm" value="20000" onchange="renderFeeTable()"></div>
 </div>
 </div>
 </div>
 
 <div class="card">
 <div class="card-header d-flex justify-content-between align-items-center">
-<span><i class="fas fa-cloud"></i> 구글 시트 명단 동기화</span>
-<button class="btn btn-primary btn-sm py-1 px-2" style="font-size: 0.8rem;" onclick="fetchGoogleSheetApi()"><i class="fas fa-sync"></i> 동기화</button>
+<span><i class="fas fa-cloud"></i> 구글 시트 연동</span>
+<button class="btn btn-primary btn-sm py-0 px-2" style="font-size: 0.75rem;" onclick="fetchGoogleSheetApi()">동기화</button>
 </div>
 <div class="card-body">
-<div class="mb-2">
-<label class="form-label fw-bold small">Apps Script Web App API URL</label>
-<input type="text" id="apiUrl" class="form-control form-control-sm" placeholder="https://script.google.com/macros/s/.../exec">
-</div>
-<textarea id="memberDBText" class="form-control form-control-sm" rows="3" placeholder="API 연결 시 자동으로 회원 목록이 로드됩니다."></textarea>
-<button class="btn btn-secondary btn-sm w-100 mt-2 btn-custom" onclick="saveMemberDB()"><i class="fas fa-download"></i> 명단 수동 적용</button>
+<input type="text" id="apiUrl" class="form-control form-control-sm mb-2" placeholder="Apps Script Web App API URL 입력">
+<textarea id="memberDBText" class="form-control form-control-sm mb-2" rows="2" placeholder="명단 데이터"></textarea>
+<button class="btn btn-secondary btn-sm w-100" onclick="saveMemberDB()">명단 수동 적용</button>
 </div>
 </div>
 
 <div class="card">
 <div class="card-header"><i class="fas fa-users"></i> 참석자 선택 및 옵션 지정</div>
 <div class="card-body">
-<div id="attendeeCheckboxes" class="mb-3"></div>
-<button class="btn btn-success w-100 btn-custom" onclick="loadAttendees()"><i class="fas fa-check"></i> 참석자 확정</button>
+<div id="attendeeCheckboxes" class="mb-2"></div>
+<button class="btn btn-success w-100 btn-sm fw-bold py-2" onclick="loadAttendees()">참석자 확정 ➔</button>
 </div>
 </div>
 </div>
 
 <!-- 2. 걷을돈 탭 -->
-<div id="tab-fee" class="tab-content-item" style="display:none;">
+<div id="tab-fee" class="tab-content-item">
 <div class="card">
 <div class="card-header d-flex justify-content-between align-items-center">
 <span><i class="fas fa-receipt"></i> 걷을 돈 요약 및 항목별 총액</span>
-<span id="paidSummaryBadge" class="badge bg-success">입금완료: 0명</span>
+<span id="paidSummaryBadge" class="badge bg-success">입금: 0명</span>
 </div>
 <div class="card-body p-2">
 <div id="feeCategorySummary" class="alert alert-primary p-2 mb-2 small" style="line-height: 1.5;"></div>
@@ -157,599 +120,426 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 </div>
 
 <!-- 3~6. 1G~4G 탭 -->
-<div id="tab-g1" class="tab-content-item" style="display:none;">
-<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 1게임 점수 입력</div><div class="card-body p-2"><div id="g1ScoreInputs"></div><div id="g1MissionSummary" class="mission-summary-box"></div></div></div>
-</div>
-<div id="tab-g2" class="tab-content-item" style="display:none;">
-<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 2게임 점수 입력</div><div class="card-body p-2"><div id="g2ScoreInputs"></div><div id="g2MissionSummary" class="mission-summary-box"></div></div></div>
-</div>
-<div id="tab-g3" class="tab-content-item" style="display:none;">
-<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 3게임 점수 입력</div><div class="card-body p-2"><div id="g3ScoreInputs"></div><div id="g3MissionSummary" class="mission-summary-box"></div></div></div>
-</div>
-<div id="tab-g4" class="tab-content-item" style="display:none;">
-<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 4게임 점수 입력</div><div class="card-body p-2"><div id="g4ScoreInputs"></div><div id="g4MissionSummary" class="mission-summary-box"></div></div></div>
-</div>
+<div id="tab-g1" class="tab-content-item"><div class="card"><div class="card-header">1게임 점수 입력</div><div class="card-body p-2"><div id="g1ScoreInputs"></div><div id="g1MissionSummary" class="mission-summary-box"></div></div></div></div>
+<div id="tab-g2" class="tab-content-item"><div class="card"><div class="card-header">2게임 점수 입력</div><div class="card-body p-2"><div id="g2ScoreInputs"></div><div id="g2MissionSummary" class="mission-summary-box"></div></div></div></div>
+<div id="tab-g3" class="tab-content-item"><div class="card"><div class="card-header">3게임 점수 입력</div><div class="card-body p-2"><div id="g3ScoreInputs"></div><div id="g3MissionSummary" class="mission-summary-box"></div></div></div></div>
+<div id="tab-g4" class="tab-content-item"><div class="card"><div class="card-header">4게임 점수 입력</div><div class="card-body p-2"><div id="g4ScoreInputs"></div><div id="g4MissionSummary" class="mission-summary-box"></div></div></div></div>
 
 <!-- 7. 상금 탭 -->
-<div id="tab-prize" class="tab-content-item" style="display:none;">
+<div id="tab-prize" class="tab-content-item">
 <div class="card">
 <div class="card-header d-flex justify-content-between align-items-center">
-<span><i class="fas fa-chart-bar"></i> 게임별 1~3위 및 최종 순위</span>
-<button class="btn btn-outline-primary btn-sm py-1" onclick="copyKakaoSummary()"><i class="fas fa-copy"></i> 카톡 복사</button>
+<span>게임별 1~3위 및 최종 순위</span>
+<button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="copyKakaoSummary()">카톡 복사</button>
 </div>
-<div class="card-body p-2">
-<div id="prizeTableBody"></div>
+<div class="card-body p-2"><div id="prizeTableBody"></div></div>
 </div>
-</div>
-
 <div class="card">
-<div class="card-header"><i class="fas fa-info-circle"></i> 정산 요약 및 저장</div>
+<div class="card-header">정산 요약 및 저장</div>
 <div class="card-body text-center">
-<div id="settlementSummary" class="text-start mb-3">-</div>
-<button class="btn btn-primary w-100 btn-custom" onclick="saveToGoogleSheet()"><i class="fas fa-cloud-upload-alt"></i> ☁️ 구글 시트로 최종 저장</button>
+<div id="settlementSummary" class="text-start mb-2 small">-</div>
+<button class="btn btn-primary w-100 btn-sm fw-bold py-2" onclick="saveToGoogleSheet()">☁️ 구글 시트로 최종 저장</button>
 </div>
 </div>
 </div>
 </div>
 
 <div class="fab-container">
-<button class="fab" title="초기화" onclick="resetAll()"><i class="fas fa-redo"></i></button>
-<button class="fab" title="저장" onclick="saveState(true)" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);"><i class="fas fa-save"></i></button>
+<button class="fab" onclick="resetAll()"><i class="fas fa-redo"></i></button>
+<button class="fab" onclick="saveState(true)" style="background: #28a745;"><i class="fas fa-save"></i></button>
 </div>
 
 <script>
 let membersDB = [];
 let attendees = [];
-const STORAGE_KEY = "burning_crew_state_v5";
-const API_URL_KEY = "burning_api_url";
-const MEMBER_DB_KEY = "burning_members";
+const STORAGE_KEY = "burning_crew_state_v7";
 
-window.onload = function() {
-loadStoredState();
-};
+window.onload = function() { loadStoredState(); };
+
+function openTab(tabName) {
+    document.querySelectorAll('.tab-content-item').forEach(el => el.classList.remove('active-tab'));
+    document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+    
+    let targetTab = document.getElementById("tab-" + tabName);
+    let targetBtn = document.getElementById(tabName + "-tab");
+    
+    if (targetTab) targetTab.classList.add('active-tab');
+    if (targetBtn) targetBtn.classList.add('active');
+    
+    if(tabName === 'fee') renderFeeTable();
+    if(tabName === 'prize') renderPrizeTable();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 function saveState(showMsg = false) {
-let state = {
-femaleHandicap: document.getElementById("femaleHandicap").value,
-maleLimit: document.getElementById("maleLimit").value,
-femaleLimit: document.getElementById("femaleLimit").value,
-gameFee: document.getElementById("gameFee").value,
-teamFee: document.getElementById("teamFee").value,
-sideFee: document.getElementById("sideFee").value,
-attendees: attendees,
-timestamp: new Date().toISOString()
-};
-localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-if(showMsg) showToast("✅ 현재 상태가 저장되었습니다");
+    let state = {
+        femaleHandicap: document.getElementById("femaleHandicap").value,
+        maleLimit: document.getElementById("maleLimit").value,
+        femaleLimit: document.getElementById("femaleLimit").value,
+        gameFee: document.getElementById("gameFee").value,
+        teamFee: document.getElementById("teamFee").value,
+        sideFee: document.getElementById("sideFee").value,
+        attendees: attendees
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if(showMsg) alert("✅ 저장되었습니다!");
 }
 
 function loadStoredState() {
-let savedState = localStorage.getItem(STORAGE_KEY);
-if(savedState) {
-try {
-let state = JSON.parse(savedState);
-document.getElementById("femaleHandicap").value = state.femaleHandicap || 15;
-document.getElementById("maleLimit").value = state.maleLimit || 210;
-document.getElementById("femaleLimit").value = state.femaleLimit || 200;
-document.getElementById("gameFee").value = state.gameFee || 14000;
-document.getElementById("teamFee").value = state.teamFee || 8000;
-document.getElementById("sideFee").value = state.sideFee || 20000;
-attendees = state.attendees || [];
-} catch(e) { console.log(e); }
-}
+    let saved = localStorage.getItem(STORAGE_KEY);
+    if(saved) {
+        try {
+            let state = JSON.parse(saved);
+            document.getElementById("femaleHandicap").value = state.femaleHandicap || 15;
+            document.getElementById("maleLimit").value = state.maleLimit || 210;
+            document.getElementById("femaleLimit").value = state.femaleLimit || 200;
+            document.getElementById("gameFee").value = state.gameFee || 14000;
+            document.getElementById("teamFee").value = state.teamFee || 8000;
+            document.getElementById("sideFee").value = state.sideFee || 20000;
+            attendees = state.attendees || [];
+        } catch(e) {}
+    }
+    let savedDB = localStorage.getItem("burning_members");
+    if(savedDB) {
+        document.getElementById("memberDBText").value = savedDB;
+        parseMemberDB();
+    }
+    let savedApi = localStorage.getItem("burning_api_url");
+    if(savedApi) document.getElementById("apiUrl").value = savedApi;
 
-let savedApiUrl = localStorage.getItem(API_URL_KEY);
-if(savedApiUrl) document.getElementById("apiUrl").value = savedApiUrl;
-
-let savedDB = localStorage.getItem(MEMBER_DB_KEY);
-if(savedDB && savedDB.trim() !== "") {
-document.getElementById("memberDBText").value = savedDB;
-parseMemberDB();
-} else if(savedApiUrl) {
-fetchGoogleSheetApi();
-}
-
-if(attendees.length > 0) {
-calculateAll();
-}
+    if(attendees.length > 0) calculateAll();
 }
 
 function resetAll() {
-if(confirm("⚠️ 작성 중인 모든 점수와 참석자 데이터가 초기화됩니다. 계속하시겠습니까?")) {
-localStorage.removeItem(STORAGE_KEY);
-attendees = [];
-location.reload();
-}
-}
-
-function showToast(message) {
-let toast = document.createElement("div");
-toast.className = "alert alert-info position-fixed bottom-0 end-0 m-3";
-toast.style.zIndex = "2000";
-toast.innerHTML = message;
-document.body.appendChild(toast);
-setTimeout(() => toast.remove(), 2000);
-}
-
-function openTab(tabName) {
-let items = document.getElementsByClassName("tab-content-item");
-for (let i = 0; i < items.length; i++) items[i].style.display = "none";
-
-let navs = document.querySelectorAll(".nav-link");
-navs.forEach(nav => nav.classList.remove("active"));
-
-document.getElementById("tab-" + tabName).style.display = "block";
-document.getElementById(tabName + "-tab").classList.add("active");
-window.scrollTo({ top: 0, behavior: 'smooth' });
+    if(confirm("초기화하시겠습니까?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+    }
 }
 
 async function fetchGoogleSheetApi() {
-let url = document.getElementById("apiUrl").value.trim();
-if(!url) { alert("Apps Script API URL을 입력해 주세요."); return; }
-localStorage.setItem(API_URL_KEY, url);
-
-try {
-let res = await fetch(url);
-let data = await res.json();
-let list = Array.isArray(data) ? data : (data.members || data.data || []);
-
-if(list.length > 0) {
-let parsedText = "";
-list.forEach(item => {
-let name = item.name || item[0];
-let ave = item.ave || item.average || item[1];
-let gender = item.gender || item[2] || '남';
-let attendRate = item.attendRate || item[3] || 0;
-if(name && ave) parsedText += `${name} ${ave} ${gender} ${attendRate}\n`;
-});
-document.getElementById("memberDBText").value = parsedText.trim();
-saveMemberDB();
-showToast("✅ 명단 동기화 완료!");
-}
-} catch(err) { alert("API 연결 중 오류가 발생했습니다."); }
+    let url = document.getElementById("apiUrl").value.trim();
+    if(!url) { alert("API URL을 입력해주세요."); return; }
+    localStorage.setItem("burning_api_url", url);
+    try {
+        let res = await fetch(url);
+        let data = await res.json();
+        let list = Array.isArray(data) ? data : (data.members || []);
+        let text = "";
+        list.forEach(i => { text += `${i.name||i[0]} ${i.ave||i[1]} ${i.gender||i[2]||'남'} ${i.attendRate||0}\n`; });
+        document.getElementById("memberDBText").value = text.trim();
+        saveMemberDB();
+        alert("동기화 완료!");
+    } catch(e) { alert("연동 오류"); }
 }
 
 function saveMemberDB() {
-let text = document.getElementById("memberDBText").value;
-localStorage.setItem(MEMBER_DB_KEY, text);
-parseMemberDB();
+    let text = document.getElementById("memberDBText").value;
+    localStorage.setItem("burning_members", text);
+    parseMemberDB();
 }
 
 function parseMemberDB() {
-let text = document.getElementById("memberDBText").value;
-let lines = text.split("\n");
-membersDB = [];
-let container = document.getElementById("attendeeCheckboxes");
-container.innerHTML = "";
-
-lines.forEach((line, index) => {
-let parts = line.trim().split(/\s+/);
-if(parts.length >= 2) {
-let name = parts[0];
-let ave = parseInt(parts[1]) || 0;
-let gender = parts[2] || '남';
-let attendRate = parseFloat(parts[3]) || 0;
-
-let autoCheck = attendRate >= 50;
-membersDB.push({ name, ave, gender, attendRate });
-
-let div = document.createElement("div");
-div.className = `member-card ${autoCheck ? 'checked' : ''}`;
-div.innerHTML = `
-                <div class="member-info d-flex align-items-center justify-content-between">
-                    <label class="form-check-label d-flex align-items-center gap-2 m-0 flex-grow-1">
-                        <input class="form-check-input member-check" type="checkbox" value="${index}" ${autoCheck ? 'checked' : ''} onchange="updateMemberCard(this)">
-                        <span class="fw-bold">${name}</span>
-                        <span class="badge ${gender === '여' || gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${gender}</span>
-                        <span class="text-muted small">Avg ${ave}</span>
+    let lines = document.getElementById("memberDBText").value.split("\n");
+    membersDB = [];
+    let container = document.getElementById("attendeeCheckboxes");
+    container.innerHTML = "";
+    lines.forEach((line, index) => {
+        let p = line.trim().split(/\s+/);
+        if(p.length >= 2) {
+            let name = p[0], ave = parseInt(p[1])||0, gender = p[2]||'남', rate = parseFloat(p[3])||0;
+            let auto = rate >= 50;
+            membersDB.push({ name, ave, gender });
+            container.innerHTML += `
+                <div class="member-card ${auto?'checked':''}">
+                    <label class="d-flex align-items-center gap-2 m-0 fw-bold">
+                        <input class="form-check-input member-check" type="checkbox" value="${index}" ${auto?'checked':''} onchange="this.closest('.member-card').classList.toggle('checked', this.checked)">
+                        ${name} <span class="badge bg-secondary">${gender}</span> <span class="text-muted small">Avg ${ave}</span>
                     </label>
-                </div>
-                <div class="member-options">
-                    <label class="member-option-label"><input type="checkbox" id="side_${index}" checked> 사이드</label>
-                    <label class="member-option-label"><input type="checkbox" id="ac_${index}" checked> AC</label>
-                    <label class="member-option-label"><input type="checkbox" id="tt_${index}" checked> TT</label>
-                </div>
-            `;
-container.appendChild(div);
-}
-});
-}
-
-function updateMemberCard(checkbox) {
-let card = checkbox.closest(".member-card");
-if(checkbox.checked) card.classList.add("checked");
-else card.classList.remove("checked");
+                    <div class="member-options">
+                        <label class="member-option-label"><input type="checkbox" id="side_${index}" checked> 사이드</label>
+                        <label class="member-option-label"><input type="checkbox" id="ac_${index}" checked> AC</label>
+                        <label class="member-option-label"><input type="checkbox" id="tt_${index}" checked> TT</label>
+                    </div>
+                </div>`;
+        }
+    });
 }
 
 function loadAttendees() {
-let checkboxes = document.querySelectorAll(".member-check:checked");
-if(checkboxes.length === 0) { alert("참석할 멤버를 선택해주세요."); return; }
-
-attendees = [];
-checkboxes.forEach(chk => {
-let idx = parseInt(chk.value);
-let m = membersDB[idx];
-attendees.push({
-name: m.name,
-ave: m.ave,
-gender: m.gender,
-joinSide: document.getElementById(`side_${idx}`).checked,
-joinAC: document.getElementById(`ac_${idx}`).checked,
-joinTT: document.getElementById(`tt_${idx}`).checked,
-isPaid: false,
-g1: 0, g2: 0, g3: 0, g4: 0,
-acSuccess: [false, false, false, false],
-ttSuccess: [false, false, false, false],
-acPrize: 0,
-ttPrize: 0
-});
-});
-
-attendees.sort((a, b) => b.ave - a.ave);
-saveState();
-renderGameTables();
-calculateAll();
-showToast("✅ 참석자 확정 완료");
-openTab('fee');
+    let checks = document.querySelectorAll(".member-check:checked");
+    if(checks.length === 0) { alert("참석자를 선택해주세요."); return; }
+    attendees = [];
+    checks.forEach(chk => {
+        let idx = parseInt(chk.value);
+        let m = membersDB[idx];
+        attendees.push({
+            name: m.name, ave: m.ave, gender: m.gender,
+            joinSide: document.getElementById(`side_${idx}`).checked,
+            joinAC: document.getElementById(`ac_${idx}`).checked,
+            joinTT: document.getElementById(`tt_${idx}`).checked,
+            isPaid: false, g1: 0, g2: 0, g3: 0, g4: 0,
+            acSuccess: [false,false,false,false], ttSuccess: [false,false,false,false],
+            acPrize: 0, ttPrize: 0, acRefund: false, ttRefund: false
+        });
+    });
+    attendees.sort((a,b) => b.ave - a.ave);
+    saveState();
+    renderGameTables();
+    calculateAll();
+    openTab('fee');
 }
 
 function renderFeeTable() {
-let tbody = document.getElementById("feeTableBody");
-let summaryEl = document.getElementById("feeCategorySummary");
-if (!tbody || !summaryEl) return;
-tbody.innerHTML = "";
+    let tbody = document.getElementById("feeTableBody");
+    let summaryEl = document.getElementById("feeCategorySummary");
+    if(!tbody || !summaryEl) return;
+    tbody.innerHTML = "";
 
-let baseGame = parseInt(document.getElementById("gameFee").value) || 0;
-let baseTeam = parseInt(document.getElementById("teamFee").value) || 0;
-let baseSide = parseInt(document.getElementById("sideFee").value) || 0;
+    let bGame = parseInt(document.getElementById("gameFee").value)||0;
+    let bTeam = parseInt(document.getElementById("teamFee").value)||0;
+    let bSide = parseInt(document.getElementById("sideFee").value)||0;
 
-let paidCount = 0;
-let totalGameSum = 0;
-let totalTeamSum = 0;
-let totalSideSum = 0;
-let totalACSum = 0;
-let totalTTSum = 0;
+    let paidCount = 0, sumGame = 0, sumTeam = 0, sumSide = 0, sumAC = 0, sumTT = 0;
+    let isAll4Finished = attendees.length > 0 && attendees.every(a => a.g4 > 0);
 
-attendees.forEach((a, idx) => {
-let sideVal = a.joinSide ? baseSide : 0;
-let acFee = a.joinAC ? 8000 : 0; // 올카바 총 8,000원 (2,000원x4G)
-let ttFee = a.joinTT ? 4000 : 0; // 텐터키 총 4,000원 (1,000원x4G)
+    attendees.forEach((a, idx) => {
+        let sideVal = a.joinSide ? bSide : 0;
+        let acFee = a.joinAC ? 8000 : 0;
+        let ttFee = a.joinTT ? 4000 : 0;
+        if(isAll4Finished) {
+            if(a.acRefund) acFee = 0;
+            if(a.ttRefund) ttFee = 0;
+        }
+        let missionVal = acFee + ttFee;
+        let total = bGame + bTeam + sideVal + missionVal;
 
-// 4게임 종료 후 환불 조건 체크 (아직 4게임 점수가 안 끝났거나 성공자가 있으면 환불 안 함)
-let isAll4GamesFinished = attendees.length > 0 && attendees.every(item => item.g4 !== undefined && item.g4 !== '' && item.g4 > 0);
-if (isAll4GamesFinished) {
-    if (a.acRefund) acFee = 0;
-    if (a.ttRefund) ttFee = 0;
-}
+        sumGame += bGame; sumTeam += bTeam; sumSide += sideVal;
+        if(!a.acRefund) sumAC += (a.joinAC?8000:0);
+        if(!a.ttRefund) sumTT += (a.joinTT?4000:0);
+        if(a.isPaid) paidCount++;
 
-let missionVal = acFee + ttFee;
-let total = baseGame + baseTeam + sideVal + missionVal;
-
-totalGameSum += baseGame;
-totalTeamSum += baseTeam;
-totalSideSum += sideVal;
-if(!a.acRefund) totalACSum += (a.joinAC ? 8000 : 0);
-if(!a.ttRefund) totalTTSum += (a.joinTT ? 4000 : 0);
-
-if (a.isPaid) paidCount++;
-
-let tr = document.createElement("tr");
-if (a.isPaid) tr.className = "paid-row";
-
-tr.innerHTML = `
+        tbody.innerHTML += `
+            <tr class="${a.isPaid?'paid-row':''}">
                 <td class="fw-bold">${a.name}</td>
-                <td>${baseGame.toLocaleString()}</td>
-                <td>${baseTeam.toLocaleString()}</td>
+                <td>${bGame.toLocaleString()}</td>
+                <td>${bTeam.toLocaleString()}</td>
                 <td>${sideVal.toLocaleString()}</td>
-                <td>${missionVal.toLocaleString()}${ (a.acRefund || a.ttRefund) ? '<br><small class="text-danger">(환불)</small>' : '' }</td>
-                <td class="fw-bold text-primary">${total.toLocaleString()}원</td>
-                <td><input type="checkbox" class="paid-check-input" ${a.isPaid ? 'checked' : ''} onchange="togglePaid(${idx}, this.checked)"></td>
-            `;
-tbody.appendChild(tr);
-});
+                <td>${missionVal.toLocaleString()}${ (a.acRefund||a.ttRefund)?'<br><small class="text-danger">환불</small>':''}</td>
+                <td class="fw-bold text-primary">${total.toLocaleString()}</td>
+                <td><input type="checkbox" class="paid-check-input" ${a.isPaid?'checked':''} onchange="attendees[${idx}].isPaid=this.checked; saveState(); renderFeeTable();"></td>
+            </tr>`;
+    });
 
-let grandTotal = totalGameSum + totalTeamSum + totalSideSum + totalACSum + totalTTSum;
-summaryEl.innerHTML = `
-    <b>📊 항목별 총 걷을 금액 요약</b><br>
-    • 게임비 총액: ${totalGameSum.toLocaleString()}원 | 팀전비 총액: ${totalTeamSum.toLocaleString()}원<br>
-    • 사이드 총액: ${totalSideSum.toLocaleString()}원 | 올카바 총액: ${totalACSum.toLocaleString()}원 | 텐터키 총액: ${totalTTSum.toLocaleString()}원<br>
-    • <b>전체 걷을 총 현금: <span class="text-primary">${grandTotal.toLocaleString()}원</span></b>
-`;
-
-let paidBadge = document.getElementById("paidSummaryBadge");
-if (paidBadge) paidBadge.innerText = `입금완료: ${paidCount} / ${attendees.length}명`;
-}
-
-function togglePaid(idx, checked) {
-attendees[idx].isPaid = checked;
-saveState();
-renderFeeTable();
+    let grandTotal = sumGame + sumTeam + sumSide + sumAC + sumTT;
+    summaryEl.innerHTML = `
+        <b>📊 항목별 총 걷을 금액 요약</b><br>
+        • 게임비 총액: ${sumGame.toLocaleString()}원 | 팀전비 총액: ${sumTeam.toLocaleString()}원<br>
+        • 사이드 총액: ${sumSide.toLocaleString()}원 | 올카바 총액: ${sumAC.toLocaleString()}원 | 텐터키 총액: ${sumTT.toLocaleString()}원<br>
+        • <b>전체 걷을 총 현금: <span class="text-primary">${grandTotal.toLocaleString()}원</span></b>
+    `;
+    let paidBadge = document.getElementById("paidSummaryBadge");
+    if(paidBadge) paidBadge.innerText = `입금완료: ${paidCount}/${attendees.length}명`;
 }
 
 function renderGameTables() {
-for(let g = 1; g <= 4; g++) {
-let container = document.getElementById(`g${g}ScoreInputs`);
-if (!container) continue;
-container.innerHTML = "";
-attendees.forEach((a, idx) => {
-let div = document.createElement("div");
-div.className = "score-input-row";
-div.innerHTML = `
-                    <div class="name-area">
-                        <span class="name">${a.name}</span>
-                        <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}" style="width:fit-content">${a.gender}</span>
+    for(let g=1; g<=4; g++) {
+        let c = document.getElementById(`g${g}ScoreInputs`);
+        if(!c) continue;
+        c.innerHTML = "";
+        attendees.forEach((a, idx) => {
+            c.innerHTML += `
+                <div class="score-input-row">
+                    <div><b>${a.name}</b> <span class="badge bg-secondary">${a.gender}</span></div>
+                    <input type="number" inputmode="numeric" min="0" max="300" value="${a['g'+g]||''}" placeholder="점수" onchange="updateScore(${idx}, ${g}, this.value)">
+                    <span id="handi_${g}_${idx}" class="small text-primary fw-bold">-</span>
+                    <div class="d-flex gap-1">
+                        <label class="small"><input type="checkbox" ${!a.joinAC?'disabled':''} ${a.acSuccess[g-1]?'checked':''} onchange="updateMission(${idx}, ${g}, 'ac', this.checked)"> AC</label>
+                        <label class="small"><input type="checkbox" ${!a.joinTT?'disabled':''} ${a.ttSuccess[g-1]?'checked':''} onchange="updateMission(${idx}, ${g}, 'tt', this.checked)"> TT</label>
                     </div>
-                    <input type="number" inputmode="numeric" class="form-control form-control-sm" min="0" max="300" value="${a['g'+g] || ''}" placeholder="점수" onchange="updateScore(${idx}, ${g}, this.value)">
-                    <span class="score-result" id="handi_${g}_${idx}">-</span>
-                    <div class="mission-checks">
-                        <label><input type="checkbox" ${!a.joinAC ? 'disabled' : ''} ${a.acSuccess[g-1] ? 'checked' : ''} onchange="updateMission(${idx}, ${g}, 'ac', this.checked)"> AC</label>
-                        <label><input type="checkbox" ${!a.joinTT ? 'disabled' : ''} ${a.ttSuccess[g-1] ? 'checked' : ''} onchange="updateMission(${idx}, ${g}, 'tt', this.checked)"> TT</label>
-                    </div>
-                `;
-container.appendChild(div);
-});
-}
+                </div>`;
+        });
+    }
 }
 
-function updateScore(idx, game, val) {
-let score = parseInt(val) || 0;
-if(score > 300) { alert("볼링 최고 점수는 300점입니다."); score = 300; }
-if(score < 0) score = 0;
-
-attendees[idx]['g' + game] = score;
-calculateAll();
-saveState();
+function updateScore(idx, g, val) {
+    let s = parseInt(val)||0;
+    if(s > 300) s = 300;
+    attendees[idx]['g'+g] = s;
+    calculateAll();
+    saveState();
 }
 
-function updateMission(idx, game, type, checked) {
-if (type === 'ac') attendees[idx].acSuccess[game - 1] = checked;
-else if (type === 'tt') attendees[idx].ttSuccess[game - 1] = checked;
-calculateAll();
-saveState();
+function updateMission(idx, g, type, checked) {
+    if(type === 'ac') attendees[idx].acSuccess[g-1] = checked;
+    if(type === 'tt') attendees[idx].ttSuccess[g-1] = checked;
+    calculateAll();
+    saveState();
 }
 
 function calculateAll() {
-let femaleHandicap = parseInt(document.getElementById("femaleHandicap").value) || 0;
-let maleLimit = parseInt(document.getElementById("maleLimit").value) || 210;
-let femaleLimit = parseInt(document.getElementById("femaleLimit").value) || 200;
+    let fHandi = parseInt(document.getElementById("femaleHandicap").value)||0;
+    let mLimit = parseInt(document.getElementById("maleLimit").value)||210;
+    let fLimit = parseInt(document.getElementById("femaleLimit").value)||200;
+    let isAll4Finished = attendees.length > 0 && attendees.every(a => a.g4 > 0);
 
-let isAll4GamesFinished = attendees.length > 0 && attendees.every(a => a.g4 !== undefined && a.g4 !== '' && a.g4 > 0);
+    attendees.forEach((a, idx) => {
+        for(let g=1; g<=4; g++) {
+            let raw = a['g'+g]||0;
+            let calc = raw;
+            if(a.gender === '여' || a.gender === 'F') {
+                calc += fHandi;
+                if(a.ave > fLimit && raw > 0) calc = Math.min(calc, fLimit);
+            } else {
+                if(a.ave > mLimit && raw > 0) calc = Math.min(calc, mLimit);
+            }
+            a['g'+g+'_calculated'] = calc;
+            let el = document.getElementById(`handi_${g}_${idx}`);
+            if(el) el.innerText = raw > 0 ? `${calc}점` : '-';
+        }
+        a.acPrize = 0; a.ttPrize = 0; a.acRefund = false; a.ttRefund = false;
+    });
 
-attendees.forEach((a, idx) => {
-for (let g = 1; g <= 4; g++) {
-let rawScore = a['g' + g] || 0;
-let handiScore = rawScore;
+    let acCarry = 0, acWinAny = false, acDetails = [];
+    for(let g=1; g<=4; g++) {
+        let pool = (attendees.filter(a=>a.joinAC).length * 2000) + acCarry;
+        let winners = attendees.filter(a => a.joinAC && a.acSuccess[g-1]);
+        let prize = 0;
+        if(winners.length > 0) {
+            acWinAny = true;
+            prize = Math.floor(pool / winners.length);
+            winners.forEach(w => w.acPrize += prize);
+            acCarry = 0;
+        } else { acCarry = pool; }
+        acDetails.push({ pool, winners, prize });
+    }
+    if(isAll4Finished && !acWinAny) attendees.forEach(a => { if(a.joinAC) a.acRefund = true; });
 
-if (a.gender === '여' || a.gender === 'F') {
-handiScore += femaleHandicap;
-if (a.ave > femaleLimit && rawScore > 0) handiScore = Math.min(handiScore, femaleLimit);
-} else {
-if (a.ave > maleLimit && rawScore > 0) handiScore = Math.min(handiScore, maleLimit);
+    let ttCarry = 0, ttWinAny = false, ttDetails = [];
+    for(let g=1; g<=4; g++) {
+        let pool = (attendees.filter(a=>a.joinTT).length * 1000) + ttCarry;
+        let winners = attendees.filter(a => a.joinTT && a.ttSuccess[g-1]);
+        let prize = 0;
+        if(winners.length > 0) {
+            ttWinAny = true;
+            prize = Math.floor(pool / winners.length);
+            winners.forEach(w => w.ttPrize += prize);
+            ttCarry = 0;
+        } else { ttCarry = pool; }
+        ttDetails.push({ pool, winners, prize });
+    }
+    if(isAll4Finished && !ttWinAny) attendees.forEach(a => { if(a.joinTT) a.ttRefund = true; });
+
+    renderFeeTable();
+    renderMissionSummaries(acDetails, ttDetails);
+    renderPrizeTable();
 }
 
-a['g' + g + '_calculated'] = handiScore;
-let el = document.getElementById(`handi_${g}_${idx}`);
-if (el) el.innerText = rawScore > 0 ? `${handiScore}점` : '-';
-}
-a.acPrize = 0;
-a.ttPrize = 0;
-a.acRefund = false;
-a.ttRefund = false;
-});
-
-// 올카바(AC) 이월 및 정산 로직 (참가비 게임당 2,000원)
-let acCarryOver = 0;
-let acAnyWinnerIn4Games = false;
-let acGameDetails = [];
-
-for (let g = 1; g <= 4; g++) {
-let activeAcCount = attendees.filter(a => a.joinAC).length;
-let currentPool = (activeAcCount * 2000) + acCarryOver;
-let winners = attendees.filter(a => a.joinAC && a.acSuccess[g - 1]);
-
-let prizePerWinner = 0;
-if (winners.length > 0) {
-acAnyWinnerIn4Games = true;
-prizePerWinner = Math.floor(currentPool / winners.length);
-winners.forEach(w => w.acPrize += prizePerWinner);
-acCarryOver = 0;
-} else {
-acCarryOver = currentPool;
-}
-acGameDetails.push({ pool: currentPool, winners, prizePerWinner });
-}
-
-if (isAll4GamesFinished && !acAnyWinnerIn4Games) {
-attendees.forEach(a => { if(a.joinAC) a.acRefund = true; });
-}
-
-// 텐터키(TT) 이월 및 정산 로직 (참가비 게임당 1,000원)
-let ttCarryOver = 0;
-let ttAnyWinnerIn4Games = false;
-let ttGameDetails = [];
-
-for (let g = 1; g <= 4; g++) {
-let activeTtCount = attendees.filter(a => a.joinTT).length;
-let currentPool = (activeTtCount * 1000) + ttCarryOver;
-let winners = attendees.filter(a => a.joinTT && a.ttSuccess[g - 1]);
-
-let prizePerWinner = 0;
-if (winners.length > 0) {
-ttAnyWinnerIn4Games = true;
-prizePerWinner = Math.floor(currentPool / winners.length);
-winners.forEach(w => w.ttPrize += prizePerWinner);
-ttCarryOver = 0;
-} else {
-ttCarryOver = currentPool;
-}
-ttGameDetails.push({ pool: currentPool, winners, prizePerWinner });
-}
-
-if (isAll4GamesFinished && !ttAnyWinnerIn4Games) {
-attendees.forEach(a => { if(a.joinTT) a.ttRefund = true; });
-}
-
-renderFeeTable();
-renderMissionSummaries(acGameDetails, ttGameDetails);
-renderPrizeTable();
-}
-
-function renderMissionSummaries(acDetails, ttDetails) {
-for (let g = 1; g <= 4; g++) {
-let ac = acDetails[g - 1];
-let tt = ttDetails[g - 1];
-let summaryBox = document.getElementById(`g${g}MissionSummary`);
-
-if (summaryBox) {
-let acText = ac.winners.length > 0 
-    ? `<span class="text-success fw-bold">성공 ${ac.winners.length}명 (${ac.winners.map(w=>w.name).join(', ')}) ➔ 인당 <b>${ac.prizePerWinner.toLocaleString()}원</b> 수령</span>` 
-    : `<span class="text-muted">성공자 없음 (총 ${ac.pool.toLocaleString()}원 다음 게임 이월)</span>`;
-
-let ttText = tt.winners.length > 0 
-    ? `<span class="text-success fw-bold">성공 ${tt.winners.length}명 (${tt.winners.map(w=>w.name).join(', ')}) ➔ 인당 <b>${tt.prizePerWinner.toLocaleString()}원</b> 수령</span>` 
-    : `<span class="text-muted">성공자 없음 (총 ${tt.pool.toLocaleString()}원 다음 게임 이월)</span>`;
-
-summaryBox.innerHTML = `
-                <div class="fw-bold mb-1 text-primary"><i class="fas fa-flag-checkered"></i> ${g}G 미션 상금 산정 내역</div>
-                <div class="small mb-1">🎯 <b>올카바(AC)</b>: ${acText}</div>
-                <div class="small">🎳 <b>텐터키(TT)</b>: ${ttText}</div>
+function renderMissionSummaries(acD, ttD) {
+    for(let g=1; g<=4; g++) {
+        let ac = acD[g-1], tt = ttD[g-1];
+        let box = document.getElementById(`g${g}MissionSummary`);
+        if(box) {
+            let acText = ac.winners.length > 0 ? `성공 ${ac.winners.length}명 ➔ 인당 <b>${ac.prize.toLocaleString()}원</b>` : `없음 (이월 ${ac.pool.toLocaleString()}원)`;
+            let ttText = tt.winners.length > 0 ? `성공 ${tt.winners.length}명 ➔ 인당 <b>${tt.prize.toLocaleString()}원</b>` : `없음 (이월 ${tt.pool.toLocaleString()}원)`;
+            box.innerHTML = `
+                <b>📌 ${g}G 미션 정산 내역</b><br>
+                • 올카바(AC): ${acText}<br>
+                • 텐터키(TT): ${ttText}
             `;
-}
-}
+        }
+    }
 }
 
 function renderPrizeTable() {
-let prizeContainer = document.getElementById("prizeTableBody");
-if (!prizeContainer) return;
+    let pContainer = document.getElementById("prizeTableBody");
+    if(!pContainer) return;
 
-let gameRankings = [];
-for(let g=1; g<=4; g++) {
-let sorted = [...attendees]
-.filter(a => a['g'+g] > 0)
-.map(a => ({ name: a.name, score: a['g'+g+'_calculated'] }))
-.sort((a, b) => b.score - a.score);
-gameRankings.push(sorted);
-}
+    let gameRankings = [];
+    for(let g=1; g<=4; g++) {
+        let sorted = [...attendees]
+            .filter(a => a['g'+g] > 0)
+            .map(a => ({ name: a.name, score: a['g'+g+'_calculated'] }))
+            .sort((a, b) => b.score - a.score);
+        gameRankings.push(sorted);
+    }
 
-let rankedList = [...attendees].map(a => {
-let total = (a.g1_calculated || 0) + (a.g2_calculated || 0) + (a.g3_calculated || 0) + (a.g4_calculated || 0);
-let avg = (total / 4).toFixed(1);
-let totalMissionPrize = (a.acPrize || 0) + (a.ttPrize || 0);
-return { ...a, total, avg, totalMissionPrize };
-});
+    let list = [...attendees].map(a => {
+        let total = (a.g1_calculated||0) + (a.g2_calculated||0) + (a.g3_calculated||0) + (a.g4_calculated||0);
+        return { ...a, total, avg: (total/4).toFixed(1), prize: (a.acPrize||0) + (a.ttPrize||0) };
+    }).sort((a,b) => b.total - a.total);
 
-rankedList.sort((a, b) => b.total - a.total);
+    let html = "";
+    for(let g=1; g<=4; g++) {
+        let ranks = gameRankings[g-1];
+        html += `<div class="mb-2 p-2 bg-light border rounded"><div class="fw-bold small text-primary mb-1">📌 ${g}게임 1~3위</div>`;
+        if(ranks.length === 0) {
+            html += `<div class="small text-muted">입력된 점수 없음</div>`;
+        } else {
+            html += `<div class="d-flex gap-2 flex-wrap small">`;
+            ranks.slice(0, 3).forEach((r, idx) => {
+                let medal = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
+                html += `<div>${medal} <b>${r.name}</b> (${r.score}점)</div>`;
+            });
+            html += `</div>`;
+        }
+        html += `</div>`;
+    }
 
-let html = "";
-for(let g=1; g<=4; g++) {
-let ranks = gameRankings[g-1];
-html += `<div class="mb-3 p-2 bg-light border rounded"><div class="fw-bold small text-primary mb-1">📌 ${g}게임 1~3위 현황</div>`;
-if(ranks.length === 0) {
-html += `<div class="small text-muted">입력된 점수가 없습니다.</div>`;
-} else {
-html += `<div class="d-flex gap-2 flex-wrap small">`;
-ranks.slice(0, 3).forEach((r, idx) => {
-let medal = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
-html += `<div>${medal} <b>${r.name}</b> (${r.score}점)</div>`;
-});
-html += `</div>`;
-}
-html += `</div>`;
-}
+    html += `<hr><div class="fw-bold mb-2">🏆 최종 합산 순위</div>`;
+    list.forEach((a, idx) => {
+        html += `
+            <div class="result-row d-flex align-items-center justify-content-between p-2 border-bottom">
+                <div><b>${idx+1}위</b> ${a.name} <span class="badge bg-secondary">${a.gender}</span></div>
+                <div class="text-end"><b>${a.total}점</b> <small class="text-muted">(Avg ${a.avg})</small>${a.prize>0?`<br><span class="text-success small">상금: ${a.prize.toLocaleString()}원</span>`:''}</div>
+            </div>`;
+    });
+    pContainer.innerHTML = html;
 
-html += `<hr><div class="fw-bold mb-2">🏆 최종 합산 순위</div>`;
-rankedList.forEach((a, idx) => {
-html += `
-                <div class="result-row">
-                    <div class="result-rank">${idx + 1}</div>
-                    <div class="result-info">
-                        <div class="name">${a.name} <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${a.gender}</span></div>
-                        <div class="score">평균 ${a.avg}점 (1G: ${a.g1_calculated||0} / 2G: ${a.g2_calculated||0} / 3G: ${a.g3_calculated||0} / 4G: ${a.g4_calculated||0})</div>
-                        ${a.totalMissionPrize > 0 ? `<div class="text-success fw-bold small">🎁 미션 상금: ${a.totalMissionPrize.toLocaleString()}원</div>` : ''}
-                    </div>
-                    <div class="result-score">${a.total}점</div>
-                </div>
-            `;
-});
+    let bGame = parseInt(document.getElementById("gameFee").value)||0;
+    let bTeam = parseInt(document.getElementById("teamFee").value)||0;
+    let bSide = parseInt(document.getElementById("sideFee").value)||0;
+    let sideCount = attendees.filter(a => a.joinSide).length;
 
-prizeContainer.innerHTML = html;
-
-let totalGameFee = attendees.length * (parseInt(document.getElementById("gameFee").value) || 0);
-let totalTeamFee = attendees.length * (parseInt(document.getElementById("teamFee").value) || 0);
-let sideCount = attendees.filter(a => a.joinSide).length;
-let totalSideFee = sideCount * (parseInt(document.getElementById("sideFee").value) || 0);
-
-let settlementEl = document.getElementById("settlementSummary");
-if (settlementEl) {
-settlementEl.innerHTML = `
-                <div class="row text-start small">
-                    <div class="col-6 mb-1"><strong>총 참석자:</strong> ${attendees.length}명</div>
-                    <div class="col-6 mb-1"><strong>사이드 참여:</strong> ${sideCount}명</div>
-                    <div class="col-6 mb-1"><strong>게임비 총액:</strong> ${totalGameFee.toLocaleString()}원</div>
-                    <div class="col-6 mb-1"><strong>팀전비 총액:</strong> ${totalTeamFee.toLocaleString()}원</div>
-                    <div class="col-12 mt-1"><strong>사이드 총 적립금:</strong> <span class="text-primary fw-bold">${totalSideFee.toLocaleString()}원</span></div>
-                </div>
-            `;
-}
+    let settlementEl = document.getElementById("settlementSummary");
+    if(settlementEl) {
+        settlementEl.innerHTML = `
+            <div class="row text-start small">
+                <div class="col-6 mb-1"><strong>총 참석자:</strong> ${attendees.length}명</div>
+                <div class="col-6 mb-1"><strong>사이드 참여:</strong> ${sideCount}명</div>
+                <div class="col-6 mb-1"><strong>게임비 총액:</strong> ${(attendees.length*bGame).toLocaleString()}원</div>
+                <div class="col-6 mb-1"><strong>팀전비 총액:</strong> ${(attendees.length*bTeam).toLocaleString()}원</div>
+                <div class="col-12 mt-1"><strong>사이드 총 적립금:</strong> <span class="text-primary fw-bold">${(sideCount*bSide).toLocaleString()}원</span></div>
+            </div>
+        `;
+    }
 }
 
 function copyKakaoSummary() {
-if(attendees.length === 0) { alert("정산할 데이터가 없습니다."); return; }
+    if(attendees.length === 0) { alert("데이터 없음"); return; }
+    let list = [...attendees].map(a => ({
+        name: a.name, total: (a.g1_calculated||0)+(a.g2_calculated||0)+(a.g3_calculated||0)+(a.g4_calculated||0),
+        prize: (a.acPrize||0) + (a.ttPrize||0)
+    })).sort((a,b) => b.total - a.total);
 
-let rankedList = [...attendees].map(a => {
-let total = (a.g1_calculated || 0) + (a.g2_calculated || 0) + (a.g3_calculated || 0) + (a.g4_calculated || 0);
-let totalMissionPrize = (a.acPrize || 0) + (a.ttPrize || 0);
-return { name: a.name, total, avg: (total/4).toFixed(1), totalMissionPrize };
-}).sort((a, b) => b.total - a.total);
-
-let text = `🎳 [Burning crew B.C 정산 결과]\n\n`;
-text += `🏆 최종 순위:\n`;
-rankedList.slice(0, 3).forEach((r, i) => {
-text += `${i+1}위: ${r.name} (${r.total}점 / Avg ${r.avg})\n`;
-});
-
-let missionWinners = rankedList.filter(r => r.totalMissionPrize > 0);
-if(missionWinners.length > 0) {
-text += `\n🎯 미션 상금 획득:\n`;
-missionWinners.forEach(m => {
-text += `• ${m.name}: ${m.totalMissionPrize.toLocaleString()}원\n`;
-});
-} else {
-text += `\n🎯 미션 상금: 4G 미성공으로 환불 처리 완료\n`;
-}
-
-text += `\n👥 총 참석자: ${attendees.length}명\n`;
-text += `💰 사이드 참가: ${attendees.filter(a => a.joinSide).length}명\n\n`;
-text += `모두 수고하셨습니다!👏`;
-
-navigator.clipboard.writeText(text).then(() => {
-showToast("📋 카톡 공유용 텍스트 복사 완료!");
-}).catch(() => alert("복사에 실패했습니다."));
+    let text = `🎳 [Burning crew B.C 정산 결과]\n\n🏆 최종 순위:\n`;
+    list.slice(0,3).forEach((r,i) => { text += `${i+1}위: ${r.name} (${r.total}점)\n`; });
+    
+    let winners = list.filter(r => r.prize > 0);
+    if(winners.length > 0) {
+        text += `\n🎯 미션 상금 획득:\n`;
+        winners.forEach(w => { text += `• ${w.name}: ${w.prize.toLocaleString()}원\n`; });
+    }
+    navigator.clipboard.writeText(text).then(() => alert("카톡 복사 완료!"));
 }
 
 async function saveToGoogleSheet() {
-const scriptUrl = document.getElementById('apiUrl').value.trim();
-if (!scriptUrl) {
-alert("⚠️ 구글 앱스 스크립트 API URL이 입력되지 않았습니다.");
-return;
-}
-
-if (attendees.length === 0) {
-alert("⚠️ 저장할 참석자 데이터가 없습니다.");
-return;
-}
-
-try {
-await fetch(scriptUrl, {
-method: 'POST',
-mode: 'no-cors',
-headers: { 'Content-Type': 'text/plain' },
-body: JSON.stringify({ attendees: attendees })
-});
-alert("☁️ 구글 시트로 최종 저장이 완료되었습니다!");
-} catch (e) {
-alert("구글 시트 저장 중 오류가 발생했습니다: " + e.message);
-}
+    let url = document.getElementById("apiUrl").value.trim();
+    if(!url) { alert("API URL 입력 필요"); return; }
+    try {
+        await fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ attendees }) });
+        alert("구글 시트 저장 완료!");
+    } catch(e) { alert("저장 실패"); }
 }
 </script>
 </body>
