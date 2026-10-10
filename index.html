@@ -129,7 +129,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 <div id="tab-fee" class="tab-content-item" style="display:none;">
 <div class="card">
 <div class="card-header d-flex justify-content-between align-items-center">
-<span><i class="fas fa-receipt"></i> 걷을 돈 요약</span>
+<span><i class="fas fa-receipt"></i> 걷을 돈 요약 (초기 입금액)</span>
 <span id="paidSummaryBadge" class="badge bg-success">입금완료: 0명</span>
 </div>
 <div class="card-body p-0">
@@ -173,7 +173,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 <div id="tab-prize" class="tab-content-item" style="display:none;">
 <div class="card">
 <div class="card-header d-flex justify-content-between align-items-center">
-<span><i class="fas fa-chart-bar"></i> 최종 순위</span>
+<span><i class="fas fa-chart-bar"></i> 게임별 1~3위 및 최종 순위</span>
 <button class="btn btn-outline-primary btn-sm py-1" onclick="copyKakaoSummary()"><i class="fas fa-copy"></i> 카톡 복사</button>
 </div>
 <div class="card-body p-2">
@@ -199,7 +199,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 <script>
 let membersDB = [];
 let attendees = [];
-const STORAGE_KEY = "burning_crew_state_v3";
+const STORAGE_KEY = "burning_crew_state_v4";
 const API_URL_KEY = "burning_api_url";
 const MEMBER_DB_KEY = "burning_members";
 
@@ -404,9 +404,10 @@ let baseSide = parseInt(document.getElementById("sideFee").value) || 0;
 let paidCount = 0;
 attendees.forEach((a, idx) => {
 let sideVal = a.joinSide ? baseSide : 0;
-let acFee = a.joinAC ? (2000 * 4) : 0;
-let ttFee = a.joinTT ? (1000 * 4) : 0;
+let acFee = a.joinAC ? 8000 : 0; // 올카바 총 8,000원 (2천원x4G)
+let ttFee = a.joinTT ? 4000 : 0; // 텐터키 총 4,000원 (1천원x4G)
 
+// 4게임 미성공 환불 처리된 경우 0원 처리
 if (a.acRefund) acFee = 0;
 if (a.ttRefund) ttFee = 0;
 
@@ -511,7 +512,7 @@ a.acRefund = false;
 a.ttRefund = false;
 });
 
-// 올카바(AC) 상금 및 이월 계산
+// 올카바(AC) 이월 및 1/N 정산 로직
 let acCarryOver = 0;
 let acAnyWinnerIn4Games = false;
 let acGameDetails = [];
@@ -537,7 +538,7 @@ if (isAll4GamesFinished && !acAnyWinnerIn4Games) {
 attendees.forEach(a => { if(a.joinAC) a.acRefund = true; });
 }
 
-// 텐터키(TT) 상금 및 이월 계산
+// 텐터키(TT) 이월 및 1/N 정산 로직
 let ttCarryOver = 0;
 let ttAnyWinnerIn4Games = false;
 let ttGameDetails = [];
@@ -576,11 +577,11 @@ let summaryBox = document.getElementById(`g${g}MissionSummary`);
 
 if (summaryBox) {
 let acText = ac.winners.length > 0 
-    ? `<span class="text-success fw-bold">성공 ${ac.winners.length}명 (${ac.winners.map(w=>w.name).join(', ')}) ➔ 1인당 <b>${ac.prizePerWinner.toLocaleString()}원</b> 수령</span>` 
+    ? `<span class="text-success fw-bold">성공 ${ac.winners.length}명 (${ac.winners.map(w=>w.name).join(', ')}) ➔ 인당 <b>${ac.prizePerWinner.toLocaleString()}원</b> 수령</span>` 
     : `<span class="text-muted">성공자 없음 (총 ${ac.pool.toLocaleString()}원 다음 게임 이월)</span>`;
 
 let ttText = tt.winners.length > 0 
-    ? `<span class="text-success fw-bold">성공 ${tt.winners.length}명 (${tt.winners.map(w=>w.name).join(', ')}) ➔ 1인당 <b>${tt.prizePerWinner.toLocaleString()}원</b> 수령</span>` 
+    ? `<span class="text-success fw-bold">성공 ${tt.winners.length}명 (${tt.winners.map(w=>w.name).join(', ')}) ➔ 인당 <b>${tt.prizePerWinner.toLocaleString()}원</b> 수령</span>` 
     : `<span class="text-muted">성공자 없음 (총 ${tt.pool.toLocaleString()}원 다음 게임 이월)</span>`;
 
 summaryBox.innerHTML = `
@@ -596,6 +597,16 @@ function renderPrizeTable() {
 let prizeContainer = document.getElementById("prizeTableBody");
 if (!prizeContainer) return;
 
+// 게임별 1~3위 파악을 위한 데이터 구성
+let gameRankings = [];
+for(let g=1; g<=4; g++) {
+let sorted = [...attendees]
+.filter(a => a['g'+g] > 0)
+.map(a => ({ name: a.name, score: a['g'+g+'_calculated'] }))
+.sort((a, b) => b.score - a.score);
+gameRankings.push(sorted);
+}
+
 let rankedList = [...attendees].map(a => {
 let total = (a.g1_calculated || 0) + (a.g2_calculated || 0) + (a.g3_calculated || 0) + (a.g4_calculated || 0);
 let avg = (total / 4).toFixed(1);
@@ -605,21 +616,41 @@ return { ...a, total, avg, totalMissionPrize };
 
 rankedList.sort((a, b) => b.total - a.total);
 
-prizeContainer.innerHTML = "";
-rankedList.forEach((a, idx) => {
-let div = document.createElement("div");
-div.className = "result-row";
-div.innerHTML = `
-                <div class="result-rank">${idx + 1}</div>
-                <div class="result-info">
-                    <div class="name">${a.name} <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${a.gender}</span></div>
-                    <div class="score">평균 ${a.avg}점 (1G: ${a.g1_calculated||0} / 2G: ${a.g2_calculated||0} / 3G: ${a.g3_calculated||0} / 4G: ${a.g4_calculated||0})</div>
-                    ${a.totalMissionPrize > 0 ? `<div class="text-success fw-bold small">🎁 미션 상금: ${a.totalMissionPrize.toLocaleString()}원</div>` : ''}
-                </div>
-                <div class="result-score">${a.total}점</div>
-            `;
-prizeContainer.appendChild(div);
+let html = "";
+// 1. 게임별 1~3위 섹션 먼저 표시
+for(let g=1; g<=4; g++) {
+let ranks = gameRankings[g-1];
+html += `<div class="mb-3 p-2 bg-light border rounded"><div class="fw-bold small text-primary mb-1">📌 ${g}게임 1~3위 현황</div>`;
+if(ranks.length === 0) {
+html += `<div class="small text-muted">입력된 점수가 없습니다.</div>`;
+} else {
+html += `<div class="d-flex gap-2 flex-wrap small">`;
+ranks.slice(0, 3).forEach((r, idx) => {
+let medal = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
+html += `<div>${medal} <b>${r.name}</b> (${r.score}점)</div>`;
 });
+html += `</div>`;
+}
+html += `</div>`;
+}
+
+// 2. 최종 순위 및 상금 섹션 표시
+html += `<hr><div class="fw-bold mb-2">🏆 최종 합산 순위</div>`;
+rankedList.forEach((a, idx) => {
+html += `
+                <div class="result-row">
+                    <div class="result-rank">${idx + 1}</div>
+                    <div class="result-info">
+                        <div class="name">${a.name} <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${a.gender}</span></div>
+                        <div class="score">평균 ${a.avg}점 (1G: ${a.g1_calculated||0} / 2G: ${a.g2_calculated||0} / 3G: ${a.g3_calculated||0} / 4G: ${a.g4_calculated||0})</div>
+                        ${a.totalMissionPrize > 0 ? `<div class="text-success fw-bold small">🎁 미션 상금: ${a.totalMissionPrize.toLocaleString()}원</div>` : ''}
+                    </div>
+                    <div class="result-score">${a.total}점</div>
+                </div>
+            `;
+});
+
+prizeContainer.innerHTML = html;
 
 let totalGameFee = attendees.length * (parseInt(document.getElementById("gameFee").value) || 0);
 let totalTeamFee = attendees.length * (parseInt(document.getElementById("teamFee").value) || 0);
