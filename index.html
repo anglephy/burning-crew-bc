@@ -157,16 +157,16 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 
 <!-- 3~6. 1G~4G 탭 -->
 <div id="tab-g1" class="tab-content-item" style="display:none;">
-<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 1게임 점수 입력</div><div class="card-body p-2"><div id="g1ScoreInputs"></div><div id="g1MissionSummary" class="mission-summary-box" style="display:none;"></div></div></div>
+<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 1게임 점수 입력</div><div class="card-body p-2"><div id="g1ScoreInputs"></div><div id="g1MissionSummary" class="mission-summary-box"></div></div></div>
 </div>
 <div id="tab-g2" class="tab-content-item" style="display:none;">
-<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 2게임 점수 입력</div><div class="card-body p-2"><div id="g2ScoreInputs"></div><div id="g2MissionSummary" class="mission-summary-box" style="display:none;"></div></div></div>
+<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 2게임 점수 입력</div><div class="card-body p-2"><div id="g2ScoreInputs"></div><div id="g2MissionSummary" class="mission-summary-box"></div></div></div>
 </div>
 <div id="tab-g3" class="tab-content-item" style="display:none;">
-<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 3게임 점수 입력</div><div class="card-body p-2"><div id="g3ScoreInputs"></div><div id="g3MissionSummary" class="mission-summary-box" style="display:none;"></div></div></div>
+<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 3게임 점수 입력</div><div class="card-body p-2"><div id="g3ScoreInputs"></div><div id="g3MissionSummary" class="mission-summary-box"></div></div></div>
 </div>
 <div id="tab-g4" class="tab-content-item" style="display:none;">
-<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 4게임 점수 입력</div><div class="card-body p-2"><div id="g4ScoreInputs"></div><div id="g4MissionSummary" class="mission-summary-box" style="display:none;"></div></div></div>
+<div class="card"><div class="card-header"><i class="fas fa-bowling-ball"></i> 4게임 점수 입력</div><div class="card-body p-2"><div id="g4ScoreInputs"></div><div id="g4MissionSummary" class="mission-summary-box"></div></div></div>
 </div>
 
 <!-- 7. 상금 탭 -->
@@ -199,7 +199,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; paddi
 <script>
 let membersDB = [];
 let attendees = [];
-const STORAGE_KEY = "burning_crew_state_v2";
+const STORAGE_KEY = "burning_crew_state_v3";
 const API_URL_KEY = "burning_api_url";
 const MEMBER_DB_KEY = "burning_members";
 
@@ -335,20 +335,20 @@ membersDB.push({ name, ave, gender, attendRate });
 let div = document.createElement("div");
 div.className = `member-card ${autoCheck ? 'checked' : ''}`;
 div.innerHTML = `
-                   <div class="member-info d-flex align-items-center justify-content-between">
-                       <label class="form-check-label d-flex align-items-center gap-2 m-0 flex-grow-1">
-                           <input class="form-check-input member-check" type="checkbox" value="${index}" ${autoCheck ? 'checked' : ''} onchange="updateMemberCard(this)">
-                           <span class="fw-bold">${name}</span>
-                           <span class="badge ${gender === '여' || gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${gender}</span>
-                           <span class="text-muted small">Avg ${ave}</span>
-                       </label>
-                   </div>
-                   <div class="member-options">
-                       <label class="member-option-label"><input type="checkbox" id="side_${index}" checked> 사이드</label>
-                       <label class="member-option-label"><input type="checkbox" id="ac_${index}" checked> AC</label>
-                       <label class="member-option-label"><input type="checkbox" id="tt_${index}" checked> TT</label>
-                   </div>
-               `;
+                <div class="member-info d-flex align-items-center justify-content-between">
+                    <label class="form-check-label d-flex align-items-center gap-2 m-0 flex-grow-1">
+                        <input class="form-check-input member-check" type="checkbox" value="${index}" ${autoCheck ? 'checked' : ''} onchange="updateMemberCard(this)">
+                        <span class="fw-bold">${name}</span>
+                        <span class="badge ${gender === '여' || gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${gender}</span>
+                        <span class="text-muted small">Avg ${ave}</span>
+                    </label>
+                </div>
+                <div class="member-options">
+                    <label class="member-option-label"><input type="checkbox" id="side_${index}" checked> 사이드</label>
+                    <label class="member-option-label"><input type="checkbox" id="ac_${index}" checked> AC</label>
+                    <label class="member-option-label"><input type="checkbox" id="tt_${index}" checked> TT</label>
+                </div>
+            `;
 container.appendChild(div);
 }
 });
@@ -403,19 +403,10 @@ let baseSide = parseInt(document.getElementById("sideFee").value) || 0;
 
 let paidCount = 0;
 attendees.forEach((a, idx) => {
-let playedGames = 0;
-for(let g=1; g<=4; g++) { if(a['g'+g] !== undefined && a['g'+g] !== '' && a['g'+g] > 0) playedGames++; }
-if(playedGames === 0) playedGames = 4; // 기본 4게임 세팅
-
 let sideVal = a.joinSide ? baseSide : 0;
+let acFee = a.joinAC ? (2000 * 4) : 0;
+let ttFee = a.joinTT ? (1000 * 4) : 0;
 
-// 기본 미션 참가비 계산 (AC 8,000 / TT 4,000)
-let acFeePerGame = 2000;
-let ttFeePerGame = 1000;
-let acFee = a.joinAC ? (acFeePerGame * playedGames) : 0;
-let ttFee = a.joinTT ? (ttFeePerGame * playedGames) : 0;
-
-// 4게임까지 전부 마친 상태에서만 환불(0원) 적용
 if (a.acRefund) acFee = 0;
 if (a.ttRefund) ttFee = 0;
 
@@ -428,14 +419,14 @@ let tr = document.createElement("tr");
 if (a.isPaid) tr.className = "paid-row";
 
 tr.innerHTML = `
-               <td class="fw-bold">${a.name}</td>
-               <td>${baseGame.toLocaleString()}</td>
-               <td>${baseTeam.toLocaleString()}</td>
-               <td>${sideVal.toLocaleString()}</td>
-               <td>${missionVal.toLocaleString()}${ (a.acRefund || a.ttRefund) ? '<br><small class="text-danger">(환불됨)</small>' : '' }</td>
-               <td class="fw-bold text-primary">${total.toLocaleString()}원</td>
-               <td><input type="checkbox" class="paid-check-input" ${a.isPaid ? 'checked' : ''} onchange="togglePaid(${idx}, this.checked)"></td>
-           `;
+                <td class="fw-bold">${a.name}</td>
+                <td>${baseGame.toLocaleString()}</td>
+                <td>${baseTeam.toLocaleString()}</td>
+                <td>${sideVal.toLocaleString()}</td>
+                <td>${missionVal.toLocaleString()}${ (a.acRefund || a.ttRefund) ? '<br><small class="text-danger">(환불됨)</small>' : '' }</td>
+                <td class="fw-bold text-primary">${total.toLocaleString()}원</td>
+                <td><input type="checkbox" class="paid-check-input" ${a.isPaid ? 'checked' : ''} onchange="togglePaid(${idx}, this.checked)"></td>
+            `;
 tbody.appendChild(tr);
 });
 
@@ -458,17 +449,17 @@ attendees.forEach((a, idx) => {
 let div = document.createElement("div");
 div.className = "score-input-row";
 div.innerHTML = `
-                   <div class="name-area">
-                       <span class="name">${a.name}</span>
-                       <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}" style="width:fit-content">${a.gender}</span>
-                   </div>
-                   <input type="number" inputmode="numeric" class="form-control form-control-sm" min="0" max="300" value="${a['g'+g] || ''}" placeholder="점수" onchange="updateScore(${idx}, ${g}, this.value)">
-                   <span class="score-result" id="handi_${g}_${idx}">-</span>
-                   <div class="mission-checks">
-                       <label><input type="checkbox" ${!a.joinAC ? 'disabled' : ''} ${a.acSuccess[g-1] ? 'checked' : ''} onchange="updateMission(${idx}, ${g}, 'ac', this.checked)"> AC</label>
-                       <label><input type="checkbox" ${!a.joinTT ? 'disabled' : ''} ${a.ttSuccess[g-1] ? 'checked' : ''} onchange="updateMission(${idx}, ${g}, 'tt', this.checked)"> TT</label>
-                   </div>
-               `;
+                    <div class="name-area">
+                        <span class="name">${a.name}</span>
+                        <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}" style="width:fit-content">${a.gender}</span>
+                    </div>
+                    <input type="number" inputmode="numeric" class="form-control form-control-sm" min="0" max="300" value="${a['g'+g] || ''}" placeholder="점수" onchange="updateScore(${idx}, ${g}, this.value)">
+                    <span class="score-result" id="handi_${g}_${idx}">-</span>
+                    <div class="mission-checks">
+                        <label><input type="checkbox" ${!a.joinAC ? 'disabled' : ''} ${a.acSuccess[g-1] ? 'checked' : ''} onchange="updateMission(${idx}, ${g}, 'ac', this.checked)"> AC</label>
+                        <label><input type="checkbox" ${!a.joinTT ? 'disabled' : ''} ${a.ttSuccess[g-1] ? 'checked' : ''} onchange="updateMission(${idx}, ${g}, 'tt', this.checked)"> TT</label>
+                    </div>
+                `;
 container.appendChild(div);
 });
 }
@@ -496,10 +487,8 @@ let femaleHandicap = parseInt(document.getElementById("femaleHandicap").value) |
 let maleLimit = parseInt(document.getElementById("maleLimit").value) || 210;
 let femaleLimit = parseInt(document.getElementById("femaleLimit").value) || 200;
 
-// 4게임이 모두 완료되었는지 체크 (모든 참가자가 4G 점수를 입력했는지 확인)
 let isAll4GamesFinished = attendees.length > 0 && attendees.every(a => a.g4 !== undefined && a.g4 !== '' && a.g4 > 0);
 
-// 1. 핸디캡 및 점수 계산
 attendees.forEach((a, idx) => {
 for (let g = 1; g <= 4; g++) {
 let rawScore = a['g' + g] || 0;
@@ -522,73 +511,83 @@ a.acRefund = false;
 a.ttRefund = false;
 });
 
-// 2. 이월 및 미션 상금 정산 (올카바 AC)
+// 올카바(AC) 상금 및 이월 계산
 let acCarryOver = 0;
 let acAnyWinnerIn4Games = false;
+let acGameDetails = [];
+
 for (let g = 1; g <= 4; g++) {
 let activeAcCount = attendees.filter(a => a.joinAC).length;
 let currentPool = (activeAcCount * 2000) + acCarryOver;
 let winners = attendees.filter(a => a.joinAC && a.acSuccess[g - 1]);
 
+let prizePerWinner = 0;
 if (winners.length > 0) {
 acAnyWinnerIn4Games = true;
-let prizePerWinner = Math.floor(currentPool / winners.length);
+prizePerWinner = Math.floor(currentPool / winners.length);
 winners.forEach(w => w.acPrize += prizePerWinner);
 acCarryOver = 0;
 } else {
 acCarryOver = currentPool;
 }
+acGameDetails.push({ pool: currentPool, winners, prizePerWinner });
 }
-// 4게임이 모두 완료되었고 성공자가 0명일 때만 환불 처리
+
 if (isAll4GamesFinished && !acAnyWinnerIn4Games) {
 attendees.forEach(a => { if(a.joinAC) a.acRefund = true; });
 }
 
-// 3. 이월 및 미션 상금 정산 (텐터키 TT)
+// 텐터키(TT) 상금 및 이월 계산
 let ttCarryOver = 0;
 let ttAnyWinnerIn4Games = false;
+let ttGameDetails = [];
+
 for (let g = 1; g <= 4; g++) {
 let activeTtCount = attendees.filter(a => a.joinTT).length;
 let currentPool = (activeTtCount * 1000) + ttCarryOver;
 let winners = attendees.filter(a => a.joinTT && a.ttSuccess[g - 1]);
 
+let prizePerWinner = 0;
 if (winners.length > 0) {
 ttAnyWinnerIn4Games = true;
-let prizePerWinner = Math.floor(currentPool / winners.length);
+prizePerWinner = Math.floor(currentPool / winners.length);
 winners.forEach(w => w.ttPrize += prizePerWinner);
 ttCarryOver = 0;
 } else {
 ttCarryOver = currentPool;
 }
+ttGameDetails.push({ pool: currentPool, winners, prizePerWinner });
 }
-// 4게임이 모두 완료되었고 성공자가 0명일 때만 환불 처리
+
 if (isAll4GamesFinished && !ttAnyWinnerIn4Games) {
 attendees.forEach(a => { if(a.joinTT) a.ttRefund = true; });
 }
 
 renderFeeTable();
-renderMissionSummaries();
+renderMissionSummaries(acGameDetails, ttGameDetails);
 renderPrizeTable();
 }
 
-function renderMissionSummaries() {
+function renderMissionSummaries(acDetails, ttDetails) {
 for (let g = 1; g <= 4; g++) {
-let acWinners = attendees.filter(a => a.acSuccess[g - 1]);
-let ttWinners = attendees.filter(a => a.ttSuccess[g - 1]);
-
+let ac = acDetails[g - 1];
+let tt = ttDetails[g - 1];
 let summaryBox = document.getElementById(`g${g}MissionSummary`);
+
 if (summaryBox) {
-if (acWinners.length === 0 && ttWinners.length === 0) {
-summaryBox.style.display = "block";
-summaryBox.innerHTML = `<div class="small text-muted text-center">🎯 ${g}G 미션 성공자 없음 (다음 게임으로 이월)</div>`;
-} else {
-summaryBox.style.display = "block";
+let acText = ac.winners.length > 0 
+    ? `<span class="text-success fw-bold">성공 ${ac.winners.length}명 (${ac.winners.map(w=>w.name).join(', ')}) ➔ 1인당 <b>${ac.prizePerWinner.toLocaleString()}원</b> 수령</span>` 
+    : `<span class="text-muted">성공자 없음 (총 ${ac.pool.toLocaleString()}원 다음 게임 이월)</span>`;
+
+let ttText = tt.winners.length > 0 
+    ? `<span class="text-success fw-bold">성공 ${tt.winners.length}명 (${tt.winners.map(w=>w.name).join(', ')}) ➔ 1인당 <b>${tt.prizePerWinner.toLocaleString()}원</b> 수령</span>` 
+    : `<span class="text-muted">성공자 없음 (총 ${tt.pool.toLocaleString()}원 다음 게임 이월)</span>`;
+
 summaryBox.innerHTML = `
-                       <div class="fw-bold mb-1"><i class="fas fa-flag-checkered"></i> ${g}G 미션 성공 현황</div>
-                       <div class="small">🎯 <strong>올카바(AC)</strong>: ${acWinners.map(a => a.name).join(', ') || '없음(이월)'} (${acWinners.length}명)</div>
-                       <div class="small">🎳 <strong>텐터키(TT)</strong>: ${ttWinners.map(a => a.name).join(', ') || '없음(이월)'} (${ttWinners.length}명)</div>
-                   `;
-}
+                <div class="fw-bold mb-1 text-primary"><i class="fas fa-flag-checkered"></i> ${g}G 미션 상금 산정 내역</div>
+                <div class="small mb-1">🎯 <b>올카바(AC)</b>: ${acText}</div>
+                <div class="small">🎳 <b>텐터키(TT)</b>: ${ttText}</div>
+            `;
 }
 }
 }
@@ -611,14 +610,14 @@ rankedList.forEach((a, idx) => {
 let div = document.createElement("div");
 div.className = "result-row";
 div.innerHTML = `
-               <div class="result-rank">${idx + 1}</div>
-               <div class="result-info">
-                   <div class="name">${a.name} <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${a.gender}</span></div>
-                   <div class="score">평균 ${a.avg}점 (1G: ${a.g1_calculated||0} / 2G: ${a.g2_calculated||0} / 3G: ${a.g3_calculated||0} / 4G: ${a.g4_calculated||0})</div>
-                   ${a.totalMissionPrize > 0 ? `<div class="text-success fw-bold small">🎁 미션 상금: ${a.totalMissionPrize.toLocaleString()}원</div>` : ''}
-               </div>
-               <div class="result-score">${a.total}점</div>
-           `;
+                <div class="result-rank">${idx + 1}</div>
+                <div class="result-info">
+                    <div class="name">${a.name} <span class="badge ${a.gender === '여' || a.gender === 'F' ? 'bg-danger' : 'bg-secondary'}">${a.gender}</span></div>
+                    <div class="score">평균 ${a.avg}점 (1G: ${a.g1_calculated||0} / 2G: ${a.g2_calculated||0} / 3G: ${a.g3_calculated||0} / 4G: ${a.g4_calculated||0})</div>
+                    ${a.totalMissionPrize > 0 ? `<div class="text-success fw-bold small">🎁 미션 상금: ${a.totalMissionPrize.toLocaleString()}원</div>` : ''}
+                </div>
+                <div class="result-score">${a.total}점</div>
+            `;
 prizeContainer.appendChild(div);
 });
 
@@ -630,14 +629,14 @@ let totalSideFee = sideCount * (parseInt(document.getElementById("sideFee").valu
 let settlementEl = document.getElementById("settlementSummary");
 if (settlementEl) {
 settlementEl.innerHTML = `
-               <div class="row text-start small">
-                   <div class="col-6 mb-1"><strong>총 참석자:</strong> ${attendees.length}명</div>
-                   <div class="col-6 mb-1"><strong>사이드 참여:</strong> ${sideCount}명</div>
-                   <div class="col-6 mb-1"><strong>게임비 총액:</strong> ${totalGameFee.toLocaleString()}원</div>
-                   <div class="col-6 mb-1"><strong>팀전비 총액:</strong> ${totalTeamFee.toLocaleString()}원</div>
-                   <div class="col-12 mt-1"><strong>사이드 총 적립금:</strong> <span class="text-primary fw-bold">${totalSideFee.toLocaleString()}원</span></div>
-               </div>
-           `;
+                <div class="row text-start small">
+                    <div class="col-6 mb-1"><strong>총 참석자:</strong> ${attendees.length}명</div>
+                    <div class="col-6 mb-1"><strong>사이드 참여:</strong> ${sideCount}명</div>
+                    <div class="col-6 mb-1"><strong>게임비 총액:</strong> ${totalGameFee.toLocaleString()}원</div>
+                    <div class="col-6 mb-1"><strong>팀전비 총액:</strong> ${totalTeamFee.toLocaleString()}원</div>
+                    <div class="col-12 mt-1"><strong>사이드 총 적립금:</strong> <span class="text-primary fw-bold">${totalSideFee.toLocaleString()}원</span></div>
+                </div>
+            `;
 }
 }
 
@@ -675,69 +674,26 @@ showToast("📋 카톡 공유용 텍스트 복사 완료!");
 }).catch(() => alert("복사에 실패했습니다."));
 }
 
-    async function saveToGoogleSheet() {
-  async function saveToGoogleSheet() {
-const scriptUrl = document.getElementById('scriptUrl')?.value?.trim();
+async function saveToGoogleSheet() {
+const scriptUrl = document.getElementById('apiUrl').value.trim();
 if (!scriptUrl) {
 alert("⚠️ 구글 앱스 스크립트 API URL이 입력되지 않았습니다.");
 return;
 }
 
-  // 1. 참석 체크된 회원 가져오기
-  // 1. 참석 체크된 회원만 필터링
-const attendingMembers = members.filter(m => m.isAttending);
-
-if (attendingMembers.length === 0) {
-alert("⚠️ 참석 체크된 회원이 없습니다. 명단을 확인해 주세요.");
+if (attendees.length === 0) {
+alert("⚠️ 저장할 참석자 데이터가 없습니다.");
 return;
 }
 
-  // 2. 점수 누락 여부 검사
-  // 2. 점수 누락 및 잘못된 값 검사
-const incompleteMembers = [];
-
-attendingMembers.forEach(m => {
-const missingGames = [];
-for (let i = 0; i < 4; i++) {
-      // 점수가 없거나, 빈 문자열이거나, 숫자가 아닌(NaN) 경우 체크
-const score = m.scores ? m.scores[i] : null;
-      // 점수가 비어있거나, null, 또는 숫자가 아닌 경우
-      if (score === null || score === undefined || score === '' || isNaN(score)) {
-      if (score === null || score === undefined || String(score).trim() === '' || isNaN(score)) {
-missingGames.push(`${i + 1}게임`);
-}
-}
-
-if (missingGames.length > 0) {
-      incompleteMembers.push(`• ${m.name} (${missingGames.join(', ')} 누락)`);
-      incompleteMembers.push(`• ${m.name}: [ ${missingGames.join(', ')} ] 점수 누락`);
-}
-});
-
-  // 3. 점수가 누락된 회원이 있다면 저장 중단 후 알림 팝업
-  // 3. 점수가 누락된 회원이 있다면 상세 알림을 띄우고 저장 차단
-if (incompleteMembers.length > 0) {
-alert(
-"⚠️ 아래 회원의 게임 점수가 누락되었습니다!\n" +
-      "점수를 모두 입력한 후 다시 저장해 주세요.\n\n" +
-      "점수를 입력하신 후 다시 저장해 주세요.\n\n" +
-incompleteMembers.join("\n")
-);
-    return; // 저장을 진행하지 않고 함수 종료
-    return; // 저장을 진행하지 않고 중단
-}
-
-  // 4. 점수가 모두 정상 입력된 경우 구글 시트로 저장 진행
-  // 4. 모든 점수가 입력된 경우에만 구글 시트로 안전하게 전송
 try {
 await fetch(scriptUrl, {
 method: 'POST',
 mode: 'no-cors',
 headers: { 'Content-Type': 'text/plain' },
-body: JSON.stringify({ attendees: attendingMembers })
+body: JSON.stringify({ attendees: attendees })
 });
-    alert("☁️ 구글 시트로 최종 누적 저장을 요청했습니다!\n(구글 시트를 확인해 보세요)");
-    alert("☁️ 구글 시트로 최종 저장이 완료되었습니다!");
+alert("☁️ 구글 시트로 최종 저장이 완료되었습니다!");
 } catch (e) {
 alert("구글 시트 저장 중 오류가 발생했습니다: " + e.message);
 }
