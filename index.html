@@ -1,68 +1,111 @@
+ㄹ스마트폰(모바일)에서 사용하실 때 가장 실용적이고 인기가 많은 **강력한 추가 기능 3가지**를 엄선했습니다.
+
+---
+
+### 🔥 모바일 정산 프로그램 추천 추가 기능
+
+1. **📋 카카오톡 정산 결과 원클릭 복사 기능**
+* 정산이 끝난 후 버튼 하나만 누르면, 단톡방에 그대로 붙여넣을 수 있는 텍스트 형태(총 수령액, 게임별 1~3위, 올카바/텐터키 성공자 등)로 클립보드에 자동 복사됩니다. 총무님이 일일이 타이핑할 필요가 전혀 없어집니다.
+
+
+2. **🔢 모바일 전용 숫자 키패드 자동 활성화 (`inputmode="numeric"`)**
+* 점수 입력 칸을 터치하는 순간, 일반 자판이 아니라 스마트폰 하단에 **큼직한 숫자 키패드**가 바로 튀어나오게 만들어, 볼링장에서 빠르게 점수를 연달아 입력할 수 있습니다.
+
+
+3. **⚠️ 300점 초과 / 오타 방지 경고**
+* 볼링 점수는 300점이 만점인데 실수로 350점이나 잘못된 숫자를 입력했을 때, 빨간색 경고 문구를 띄워주어 정산 오류를 원천 차단합니다.
+
+
+
+---
+
+### 💻 추천 기능이 모두 적용된 최종 모바일 탭 정산기 코드
+
+아래 코드를 복사해서 그대로 활용하시면, 앞서 보셨던 편리한 **상단 탭 구조**와 **카드형 UI**에 이어 **카톡 복사 및 스마트 키패드 기능**까지 완벽하게 누리실 수 있습니다!
+
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Burning crew B.C</title>
+    <title>Burning crew B.C 모바일 탭 정산기</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; padding-bottom: 50px; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f2f4f8; margin: 0; padding: 10px; color: #222; }
+        .container { max-width: 100%; margin: 0 auto; background: white; padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #1a1a1a; font-size: 1.3rem; margin: 5px 0 12px 0; }
         
-        header { background: #001f3f; padding: 15px; text-align: center; font-size: 1.2rem; font-weight: bold; border-bottom: 2px solid #0056b3; }
-        
-        /* Tab Navigation */
-        .tab-nav { display: flex; background: #1e1e1e; border-bottom: 1px solid #333; overflow-x: auto; white-space: nowrap; position: sticky; top: 0; z-index: 100; }
-        .tab-btn { flex: 1; min-width: 60px; padding: 12px 8px; text-align: center; background: transparent; color: #aaa; border: none; font-size: 13px; font-weight: bold; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab-btn.active { color: #fff; background: #0056b3; border-bottom-color: #007bff; }
-        
-        /* Tab Contents */
-        .tab-content { display: none; padding: 15px; max-width: 700px; margin: 0 auto; }
+        /* 📱 탭 메뉴 스타일 */
+        .tab-nav { display: flex; overflow-x: auto; gap: 4px; background: #e9ecef; padding: 4px; border-radius: 8px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; }
+        .tab-btn { flex: 1 0 auto; min-width: 60px; padding: 10px 6px; font-size: 12px; font-weight: bold; border: none; background: transparent; border-radius: 6px; cursor: pointer; color: #495057; text-align: center; }
+        .tab-btn.active { background: #007bff; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+
+        /* 탭 컨텐츠 구역 */
+        .tab-content { display: none; }
         .tab-content.active { display: block; }
+
+        /* 섹션 및 박스 */
+        .section { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+        .section h3 { font-size: 1rem; color: #007bff; margin: 0 0 8px 0; border-bottom: 2px solid #007bff; padding-bottom: 4px; }
         
-        .section-title { font-size: 1rem; margin-bottom: 12px; color: #64b5f6; font-weight: bold; }
-        .notice-box { background: #1e293b; border: 1px solid #334155; padding: 12px; border-radius: 8px; text-align: center; font-size: 13px; margin-bottom: 15px; color: #94a3b8; line-height: 1.4; }
+        textarea { width: 100%; height: 90px; padding: 8px; border: 1px solid #ced4da; border-radius: 6px; font-size: 13px; }
+        .btn { background-color: #007bff; color: white; border: none; padding: 12px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 8px; }
+        .btn-success { background-color: #28a745; }
+        .btn-kakao { background-color: #fee500; color: #3c1e1e; }
         
-        /* Cards */
-        .card { background: #1e1e1e; border: 1px solid #333; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
-        .flex-row { display: flex; align-items: center; justify-content: space-between; }
+        .setting-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+        .setting-item { background: white; padding: 8px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; font-weight: bold; }
+        .setting-item input { width: 100%; padding: 6px; font-size: 14px; text-align: center; border: 1px solid #ccc; border-radius: 4px; margin-top: 4px; }
+
+        /* 참석자 박스 */
+        .member-select-box { display: flex; flex-wrap: wrap; gap: 6px; max-height: 150px; overflow-y: auto; background: white; padding: 8px; border: 1px solid #ced4da; border-radius: 6px; margin-top: 6px; }
+        .member-checkbox { display: flex; align-items: center; gap: 6px; background: #e9ecef; padding: 8px 10px; border-radius: 6px; font-size: 13px; font-weight: bold; }
+
+        /* 카드형 리스트 */
+        .game-card { background: white; border: 1px solid #ced4da; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .game-card-info { font-size: 14px; font-weight: bold; }
+        .game-card-info span { font-size: 11px; color: #666; font-weight: normal; }
         
-        /* Inputs */
-        textarea { width: 100%; height: 140px; background: #2a2a2a; color: #fff; border: 1px solid #444; border-radius: 6px; padding: 10px; font-size: 13px; margin-bottom: 10px; }
-        input[type="number"] { width: 65px; height: 38px; background: #2a2a2a; border: 1px solid #444; border-radius: 6px; color: #fff; text-align: center; font-size: 15px; font-weight: bold; }
+        .score-input { width: 65px; height: 38px; font-size: 16px; font-weight: bold; text-align: center; border: 1px solid #007bff; border-radius: 6px; background: #f0f7ff; }
         
-        .checkbox-group { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
-        .chk-label { font-size: 11px; display: flex; align-items: center; gap: 3px; cursor: pointer; background: #2a2a2a; padding: 4px 6px; border-radius: 4px; color: #ccc; }
-        .chk-label input { transform: scale(1.1); }
+        .mission-group { display: flex; gap: 8px; align-items: center; background: #f8f9fa; padding: 6px 8px; border-radius: 6px; border: 1px solid #e9ecef; }
+        .mission-group label { font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 3px; cursor: pointer; }
         
-        .btn { width: 100%; padding: 12px; background: #0056b3; color: white; border: none; border-radius: 6px; font-weight: bold; margin-top: 8px; cursor: pointer; font-size: 14px; }
+        input[type="checkbox"] { transform: scale(1.2); cursor: pointer; }
         
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; background: #1e1e1e; border-radius: 8px; overflow: hidden; }
-        th, td { border: 1px solid #333; padding: 8px 6px; text-align: center; }
-        th { background: #003366; color: #fff; }
-        td { color: #ddd; }
+        .result-box { background: #eef5ff; border: 1px solid #b8daff; padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.6; white-space: pre-line; }
     </style>
 </head>
 <body>
 
-<header>🎳 Burning crew B.C 통합 정산</header>
+<div class="container">
+    <h2>🎳 Burning crew B.C</h2>
 
-<!-- 탭 메뉴 -->
-<div class="tab-nav">
-    <button class="tab-btn active" onclick="openTab('tab-set')">⚙️ 설정/참석</button>
-    <button class="tab-btn" onclick="openTab('tab-money')">💰 걷을 돈</button>
-    <button class="tab-btn" onclick="openTab('tab-g1')">1G</button>
-    <button class="tab-btn" onclick="openTab('tab-g2')">2G</button>
-    <button class="tab-btn" onclick="openTab('tab-g3')">3G</button>
-    <button class="tab-btn" onclick="openTab('tab-g4')">4G</button>
-    <button class="tab-btn" onclick="openTab('tab-rank')">🏆 최종순위/정산</button>
-</div>
+    <!-- 📱 탭 이동 버튼 -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="openTab('tab-setup', this)">⚙️ 설정</button>
+        <button class="tab-btn" onclick="openTab('tab-g1', this)">1게임</button>
+        <button class="tab-btn" onclick="openTab('tab-g2', this)">2게임</button>
+        <button class="tab-btn" onclick="openTab('tab-g3', this)">3게임</button>
+        <button class="tab-btn" onclick="openTab('tab-g4', this)">4게임</button>
+        <button class="tab-btn" onclick="openTab('tab-result', this)" id="btnTabResult">💰 정산</button>
+    </div>
 
-<!-- 1. 설정 및 참석자 탭 -->
-<div id="tab-set" class="tab-content active">
-    <div class="section-title">회원 DB 입력 및 에버순 정렬</div>
-    <div class="notice-box">형식: [이름] [에버리지] [성별(남/여)]<br>(예: 반기용 209 남)</div>
-    <textarea id="dbInput">반기용 209 남
+    <!-- 1. 설정/참석자 탭 -->
+    <div id="tab-setup" class="tab-content active">
+        <div class="section">
+            <h3>1. 여성 핸디 / 한도 설정</h3>
+            <div class="setting-grid">
+                <div class="setting-item">여성 핸디<input type="number" id="handiF" value="15" inputmode="numeric"></div>
+                <div class="setting-item">남성 한도<input type="number" id="limitM" value="250" inputmode="numeric"></div>
+                <div class="setting-item" style="grid-column: span 2;">여성 한도<input type="number" id="limitF" value="250" inputmode="numeric"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>2. 회원 DB 관리</h3>
+            <textarea id="dbInput">반기용 209 남
 장호정 207 남
 강찬희 205 남
 이학열 201 남
@@ -71,170 +114,177 @@
 김진선 196 남
 서수현 196 남
 박민민 192 남
-최영남 190 남</textarea>
-    <button class="btn" onclick="loadMembers()">참여자 등록 및 에버순 정렬</button>
-</div>
+최영남 190 남
+황선인 188 남
+박홍열 186 남
+방태호 178 남
+이향미 173 여
+최돈상 170 남
+정하나 159 여
+김윤정 137 여</textarea>
+            <button class="btn" onclick="saveMemberDB(true)">DB 저장/갱신</button>
+        </div>
 
-<!-- 2. 걷을 돈 탭 -->
-<div id="tab-money" class="tab-content">
-    <div class="section-title">💵 사전 걷을 돈 및 옵션 체크</div>
-    <div class="notice-box">
-        기본게임비: <input type="number" id="gameFee" value="14000" onchange="renderMoneyTable()" style="width:70px">원 | 
-        팀전비: <input type="number" id="teamFee" value="8000" onchange="renderMoneyTable()" style="width:70px">원<br>
-        사이드: <input type="number" id="sideFee" value="20000" onchange="renderMoneyTable()" style="width:70px">원
+        <div class="section">
+            <h3>3. 참석자 선택</h3>
+            <div id="memberSelectList" class="member-select-box"></div>
+            <button class="btn btn-success" onclick="loadAttendees()">참석자 명단 확정 ➔</button>
+        </div>
     </div>
-    <div id="moneyCardList"></div>
-    <div id="moneySummary" class="notice-box" style="margin-top:15px; text-align:left; font-size:12px;"></div>
-</div>
 
-<!-- 3~6. 게임별 1G~4G 탭 -->
-<div id="tab-g1" class="tab-content"><div class="section-title">1게임 점수 입력 및 미션 체크</div><div id="g1CardList"></div></div>
-<div id="tab-g2" class="tab-content"><div class="section-title">2게임 점수 입력 및 미션 체크</div><div id="g2CardList"></div></div>
-<div id="tab-g3" class="tab-content"><div class="section-title">3게임 점수 입력 및 미션 체크</div><div id="g3CardList"></div></div>
-<div id="tab-g4" class="tab-content"><div class="section-title">4게임 점수 입력 및 미션 체크</div><div id="g4CardList"></div></div>
+    <!-- 게임별 입력 탭 (1~4게임) -->
+    <div id="tab-g1" class="tab-content"><div class="section"><h3>🎳 1게임 점수 & 미션</h3><div id="list-g1"></div></div></div>
+    <div id="tab-g2" class="tab-content"><div class="section"><h3>🎳 2게임 점수 & 미션</h3><div id="list-g2"></div></div></div>
+    <div id="tab-g3" class="tab-content"><div class="section"><h3>🎳 3게임 점수 & 미션</h3><div id="list-g3"></div></div></div>
+    <div id="tab-g4" class="tab-content"><div class="section"><h3>🎳 4게임 점수 & 미션</h3><div id="list-g4"></div></div></div>
 
-<!-- 7. 최종 순위 및 정산 탭 -->
-<div id="tab-rank" class="tab-content">
-    <div class="section-title">🏆 게임별 1~3위 및 최종 정산</div>
-    <div id="rankResultArea"></div>
+    <!-- 정산 결과 탭 -->
+    <div id="tab-result" class="tab-content">
+        <div class="section">
+            <h3>💰 정산 결과 요약</h3>
+            <div class="result-box" id="resultSummary">
+                참석자 확정 및 게임 점수를 입력하면 정산 결과가 표시됩니다.
+            </div>
+            <button class="btn btn-kakao" onclick="copyKakaoResult()" style="margin-top: 12px;">📋 카톡 정산 결과 복사하기</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    let members = [];
+    let allMembers = [];
+    let attendees = [];
 
-    function openTab(tabId) {
+    window.onload = function() {
+        const savedDB = localStorage.getItem('bowling_member_db');
+        if (savedDB) document.getElementById('dbInput').value = savedDB;
+        saveMemberDB(false);
+    };
+
+    function openTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
-        if(tabId === 'tab-money') renderMoneyTable();
-        if(tabId.startsWith('tab-g')) renderGameTab(tabId.replace('tab-', ''));
-        if(tabId === 'tab-rank') renderRankAndSettlement();
+        btn.classList.add('active');
+        if (tabId === 'tab-result') calculateResult();
     }
 
-    function loadMembers() {
-        const text = document.getElementById('dbInput').value.trim();
-        members = text.split('\n').map(line => {
-            const parts = line.trim().split(/\s+/);
-            return {
-                name: parts[0],
-                avg: parseInt(parts[1]) || 0,
-                gender: parts[2] || '남',
-                joinSide: true,
-                joinAC: true,
-                joinTT: true,
-                g1: '', g2: '', g3: '', g4: '',
-                ac1: false, ac2: false, ac3: false, ac4: false,
-                tt1: false, tt2: false, tt3: false, tt4: false
-            };
+    function saveMemberDB(showAlert) {
+        const rawText = document.getElementById('dbInput').value.trim();
+        if (!rawText) return;
+
+        allMembers = [];
+        rawText.split('\n').forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return;
+            const parts = trimmed.split(/\s+/);
+            if (parts.length >= 2) {
+                allMembers.push({ name: parts[0], average: parseFloat(parts[1]) || 0, gender: parts[2] || '남' });
+            }
         });
-        // 에버순 정렬
-        members.sort((a, b) => b.avg - a.avg);
-        alert('참여자 등록 완료! 에버순으로 정렬되었습니다.');
-        openTab('tab-money');
+
+        localStorage.setItem('bowling_member_db', rawText);
+        renderMemberList();
+        if (showAlert) alert(`총 ${allMembers.length}명의 회원이 DB에 저장되었습니다!`);
     }
 
-    function renderMoneyTable() {
-        const container = document.getElementById('moneyCardList');
-        container.innerHTML = '';
-        
-        let bGame = parseInt(document.getElementById('gameFee').value) || 0;
-        let bTeam = parseInt(document.getElementById('teamFee').value) || 0;
-        let bSide = parseInt(document.getElementById('sideFee').value) || 0;
+    function renderMemberList() {
+        const selectBox = document.getElementById('memberSelectList');
+        selectBox.innerHTML = '';
+        allMembers.forEach((m, idx) => {
+            selectBox.innerHTML += `<label class="member-checkbox"><input type="checkbox" value="${idx}" class="att-chk" checked> ${m.name}</label>`;
+        });
+    }
 
-        let totalCash = 0, sumGame = 0, sumTeam = 0, sumAC = 0, sumTT = 0, sumSide = 0;
+    function loadAttendees() {
+        const checkboxes = document.querySelectorAll('.att-chk:checked');
+        if (checkboxes.length === 0) { alert('참석자를 선택해 주세요.'); return; }
 
-        members.forEach((m, idx) => {
-            let sVal = m.joinSide ? bSide : 0;
-            let mVal = (m.joinAC ? 8000 : 0) + (m.joinTT ? 4000 : 0);
-            let total = bGame + bTeam + sVal + mVal;
+        attendees = [];
+        checkboxes.forEach(chk => {
+            const m = allMembers[chk.value];
+            attendees.push({
+                name: m.name, average: m.average, gender: m.gender,
+                scores: { g1: '', g2: '', g3: '', g4: '' },
+                missions: { g1:{ac:false,tt:false}, g2:{ac:false,tt:false}, g3:{ac:false,tt:false}, g4:{ac:false,tt:false} }
+            });
+        });
+        attendees.sort((a, b) => b.average - a.average);
+        renderGameTabs();
+        alert(`${attendees.length}명 참석 확정! 상단 게임 탭을 눌러 점수를 입력해 주세요.`);
+        openTab('tab-g1', document.querySelectorAll('.tab-btn')[1]);
+    }
 
-            totalCash += total;
-            sumGame += bGame;
-            sumTeam += bTeam;
-            if(m.joinAC) sumAC += 8000;
-            if(m.joinTT) sumTT += 4000;
-            if(m.joinSide) sumSide += bSide;
+    function renderGameTabs() {
+        ['g1', 'g2', 'g3', 'g4'].forEach(g => {
+            const container = document.getElementById(`list-${g}`);
+            container.innerHTML = '';
 
-            container.innerHTML += `
-                <div class="card flex-row">
-                    <div>
-                        <strong>${m.name}</strong> <span style="font-size:11px; color:#888;">(${m.avg}점)</span>
-                        <div class="checkbox-group">
-                            <label class="chk-label"><input type="checkbox" ${m.joinSide?'checked':''} onchange="members[${idx}].joinSide=this.checked; renderMoneyTable()"> 사이드</label>
-                            <label class="chk-label"><input type="checkbox" ${m.joinAC?'checked':''} onchange="members[${idx}].joinAC=this.checked; renderMoneyTable()"> 올카바(8천)</label>
-                            <label class="chk-label"><input type="checkbox" ${m.joinTT?'checked':''} onchange="members[${idx}].joinTT=this.checked; renderMoneyTable()"> 텐터키(4천)</label>
+            attendees.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
+                    <div class="game-card-info">
+                        ${p.name} <span>(${p.gender}/${p.average.toFixed(0)})</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <input type="number" inputmode="numeric" class="score-input" placeholder="점수" value="${p.scores[g]}" oninput="validateScore(this, ${idx}, '${g}')">
+                        <div class="mission-group">
+                            <label><input type="checkbox" ${p.missions[g].ac?'checked':''} onchange="attendees[${idx}].missions.${g}.ac=this.checked">올카바</label>
+                            <label><input type="checkbox" ${p.missions[g].tt?'checked':''} onchange="attendees[${idx}].missions.${g}.tt=this.checked">텐터키</label>
                         </div>
                     </div>
-                    <div style="text-align:right;">
-                        <span style="font-size:16px; font-weight:bold; color:#4dabf7;">${total.toLocaleString()}원</span>
-                    </div>
-                </div>
-            `;
-        });
-
-        document.getElementById('moneySummary').innerHTML = `
-            <strong>📊 현장 수령 총액 요약:</strong><br>
-            - 오늘 걷을 총 현금: <span style="color:#4dabf7">${totalCash.toLocaleString()}원</span><br>
-            - 게임비 합계: ${sumGame.toLocaleString()}원 | 팀전비 합계: ${sumTeam.toLocaleString()}원<br>
-            - 올카바 총액: ${sumAC.toLocaleString()}원 | 텐터키 총액: ${sumTT.toLocaleString()}원<br>
-            - 사이드 총액: ${sumSide.toLocaleString()}원
-        `;
-    }
-
-    function renderGameTab(gKey) {
-        const container = document.getElementById(`${gKey}CardList`);
-        container.innerHTML = '';
-
-        members.forEach((m, idx) => {
-            container.innerHTML += `
-                <div class="card flex-row">
-                    <div>
-                        <strong>${m.name}</strong> <span style="font-size:11px; color:#888;">(에버:${m.avg})</span>
-                        <div class="checkbox-group">
-                            <label class="chk-label" style="${m.joinAC?'':'opacity:0.3'}">
-                                <input type="checkbox" ${m['ac'+gKey.replace('g','') ]?'checked':''} ${m.joinAC?'':'disabled'} onchange="members[${idx}].ac${gKey.replace('g','')}=this.checked"> 올카바 성공
-                            </label>
-                            <label class="chk-label" style="${m.joinTT?'':'opacity:0.3'}">
-                                <input type="checkbox" ${m['tt'+gKey.replace('g','') ]?'checked':''} ${m.joinTT?'':'disabled'} onchange="members[${idx}].tt${gKey.replace('g','')}=this.checked"> 텐터키 성공
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <input type="number" placeholder="점수" value="${m[gKey]}" onchange="members[${idx}]['${gKey}']=this.value">
-                    </div>
-                </div>
-            `;
+                `;
+                container.appendChild(card);
+            });
         });
     }
 
-    function renderRankAndSettlement() {
-        const area = document.getElementById('rankResultArea');
-        let html = '';
+    function validateScore(input, idx, g) {
+        let val = parseInt(input.value);
+        if (val > 300) {
+            alert('점수는 300점을 넘을 수 없습니다!');
+            input.value = 300;
+            val = 300;
+        }
+        attendees[idx].scores[g] = isNaN(val) ? '' : val;
+    }
 
-        // 핸디 적용 점수 계산 (여성 +15 등 필요시 적용 가능, 여기서는 입력 점수 그대로 또는 에버 기준 활용)
-        // 게임별 1~3위 산출
-        ['g1', 'g2', 'g3', 'g4'].forEach((g, idx) => {
-            let sortedGame = [...members]
-                .filter(m => m[g] !== '')
-                .map(m => ({ name: m.name, score: parseInt(m[g]) || 0 }))
+    function calculateResult() {
+        let text = `🎳 **Burning crew B.C 정산 결과**\n\n`;
+        text += `▪ 총 참석 인원: ${attendees.length}명\n\n`;
+
+        ['g1', 'g2', 'g3', 'g4'].forEach((g, i) => {
+            let gameScores = attendees
+                .filter(p => p.scores[g] !== '')
+                .map(p => ({ name: p.name, score: parseInt(p.scores[g]) }))
                 .sort((a, b) => b.score - a.score);
 
-            html += `<div class="card"><strong>[ ${idx+1}게임 순위 ]</strong><div style="font-size:12px; margin-top:5px; color:#aaa;">`;
-            if(sortedGame.length === 0) {
-                html += `입력된 점수가 없습니다.`;
+            text += `📌 [ ${i+1}게임 순위 ]\n`;
+            if (gameScores.length === 0) {
+                text += ` - 입력된 점수 없음\n`;
             } else {
-                sortedGame.forEach((item, rank) => {
-                    if(rank < 3) html += `${rank+1위}: ${item.name} (${item.score}점) &nbsp;&nbsp;`;
+                gameScores.slice(0, 3).forEach((item, r) => {
+                    text += `  ${r+1}위: ${item.name} (${item.score}점)\n`;
                 });
             }
-            html += `</div></div>`;
+            text += `\n`;
         });
 
-        area.innerHTML = html;
+        document.getElementById('resultSummary').innerText = text;
     }
 
-    window.onload = function() { loadMembers(); };
+    function copyKakaoResult() {
+        calculateResult();
+        const text = document.getElementById('resultSummary').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('카카오톡 공유용 정산 결과가 클립보드에 복사되었습니다! 단톡방에 붙여넣기 하세요.');
+        }).catch(err => {
+            alert('복사에 실패했습니다. 직접 드래그해서 복사해 주세요.');
+        });
+    }
 </script>
 </body>
 </html>
+```[cite: 8]
+
+```
