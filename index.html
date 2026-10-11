@@ -119,13 +119,20 @@
         }
 
         input[type="text"],
-        input[type="number"] {
-            width: 60px;
-            padding: 4px 6px;
-            text-align: center;
+        input[type="number"],
+        input[type="url"] {
+            width: 100%;
+            min-width: 150px;
+            padding: 6px 8px;
+            text-align: left;
             font-size: 13px;
             border: 1px solid var(--border);
             border-radius: 4px;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            text-align: center;
         }
 
         .btn {
@@ -163,24 +170,52 @@
             font-size: 12px;
         }
 
-        .pill {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: bold;
-            background: #dbeafe;
-            color: #1e3a8a;
-        }
-
         .small-btn {
             padding: 4px 8px;
             font-size: 11px;
+        }
+
+        .sheet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .sheet-grid label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
         }
     </style>
 </head>
 <body>
     <h1>🎳 Burning crew B.C 통합 정산 프로그램</h1>
+
+    <div class="card">
+        <h3>Google Sheets 연동 설정</h3>
+        <p class="muted">실제 운영용은 Apps Script Web App 기반으로 연결하는 방식이 가장 안전합니다. API 키만으로는 쓰기 권한이 제한될 수 있습니다.</p>
+        <div class="sheet-grid">
+            <label>
+                Apps Script Web App URL
+                <input id="sheetAppUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
+            </label>
+            <label>
+                Google Sheet ID
+                <input id="sheetId" type="text" placeholder="1AbCd..." />
+            </label>
+            <label>
+                시트 이름
+                <input id="sheetName" type="text" placeholder="BurningCrew" />
+            </label>
+        </div>
+        <div class="flex-box">
+            <button class="btn" onclick="saveSheetConfigFromForm()">설정 저장</button>
+            <button class="btn btn-success" onclick="loadMembersFromGoogleSheets()">Google에서 불러오기</button>
+            <button class="btn" onclick="syncMembersToGoogleSheets()">Google에 저장하기</button>
+        </div>
+    </div>
 
     <div class="tab-container">
         <button class="tab-btn active" onclick="switchTab(0)">1. 회원DB 및 참석</button>
@@ -321,6 +356,7 @@
 
     <script>
         const STORAGE_KEY = 'burning_members_v1';
+        const SHEET_CONFIG_KEY = 'burning_sheet_config_v1';
 
         const defaultMembers = [
             { name: '반기용', avg: 185, gender: '남', isAttending: true, side: true, ac: true, tt: true, scores: [170, 180, 190, 185], acSuccess: [false, true, false, false], ttSuccess: [false, false, true, false] },
@@ -328,6 +364,12 @@
             { name: '장호정', avg: 190, gender: '여', isAttending: true, side: false, ac: true, tt: true, scores: [190, 185, 200, 195], acSuccess: [true, false, false, false], ttSuccess: [false, true, false, false] },
             { name: '홍길동', avg: 160, gender: '남', isAttending: false, side: false, ac: false, tt: false, scores: [0, 0, 0, 0], acSuccess: [false, false, false, false], ttSuccess: [false, false, false, false] }
         ];
+
+        const defaultSheetConfig = {
+            appsScriptUrl: '',
+            spreadsheetId: '',
+            sheetName: 'BurningCrew'
+        };
 
         function safeParseMembers() {
             try {
@@ -339,6 +381,17 @@
             } catch (error) {
                 console.warn('로컬 저장소 읽기 오류:', error);
                 return defaultMembers.map(cloneMember);
+            }
+        }
+
+        function getSheetConfig() {
+            try {
+                const raw = localStorage.getItem(SHEET_CONFIG_KEY);
+                if (!raw) return { ...defaultSheetConfig };
+                return { ...defaultSheetConfig, ...JSON.parse(raw) };
+            } catch (error) {
+                console.warn('시트 설정 읽기 오류:', error);
+                return { ...defaultSheetConfig };
             }
         }
 
@@ -366,9 +419,133 @@
 
         let members = safeParseMembers();
 
+        function populateSheetConfigForm() {
+            const config = getSheetConfig();
+            document.getElementById('sheetAppUrl').value = config.appsScriptUrl || '';
+            document.getElementById('sheetId').value = config.spreadsheetId || '';
+            document.getElementById('sheetName').value = config.sheetName || 'BurningCrew';
+        }
+
+        function saveSheetConfigFromForm() {
+            const config = {
+                appsScriptUrl: document.getElementById('sheetAppUrl').value.trim(),
+                spreadsheetId: document.getElementById('sheetId').value.trim(),
+                sheetName: document.getElementById('sheetName').value.trim() || 'BurningCrew'
+            };
+            localStorage.setItem(SHEET_CONFIG_KEY, JSON.stringify(config));
+            alert('Google Sheets 연동 설정이 저장되었습니다.');
+        }
+
+        function getGoogleSheetPayload() {
+            return members.map((member) => ({
+                name: member.name,
+                avg: member.avg,
+                gender: member.gender,
+                isAttending: member.isAttending ? 1 : 0,
+                side: member.side ? 1 : 0,
+                ac: member.ac ? 1 : 0,
+                tt: member.tt ? 1 : 0,
+                score1: member.scores[0] || 0,
+                score2: member.scores[1] || 0,
+                score3: member.scores[2] || 0,
+                score4: member.scores[3] || 0,
+                ac1: member.acSuccess[0] ? 1 : 0,
+                ac2: member.acSuccess[1] ? 1 : 0,
+                ac3: member.acSuccess[2] ? 1 : 0,
+                ac4: member.acSuccess[3] ? 1 : 0,
+                tt1: member.ttSuccess[0] ? 1 : 0,
+                tt2: member.ttSuccess[1] ? 1 : 0,
+                tt3: member.ttSuccess[2] ? 1 : 0,
+                tt4: member.ttSuccess[3] ? 1 : 0
+            }));
+        }
+
+        async function syncMembersToGoogleSheets() {
+            const config = getSheetConfig();
+            if (!config.appsScriptUrl || !config.spreadsheetId) {
+                alert('Apps Script URL과 시트 ID를 먼저 입력하세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(config.appsScriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'saveMembers',
+                        spreadsheetId: config.spreadsheetId,
+                        sheetName: config.sheetName,
+                        data: getGoogleSheetPayload()
+                    })
+                });
+
+                const text = await response.text();
+                if (!response.ok) throw new Error(text || '저장 실패');
+                alert('Google Sheets에 저장되었습니다.');
+            } catch (error) {
+                console.error(error);
+                alert('Google Sheets 저장 중 오류가 발생했습니다.\n\n' + error.message);
+            }
+        }
+
+        async function loadMembersFromGoogleSheets() {
+            const config = getSheetConfig();
+            if (!config.appsScriptUrl || !config.spreadsheetId) {
+                alert('Apps Script URL과 시트 ID를 먼저 입력하세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(config.appsScriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'loadMembers',
+                        spreadsheetId: config.spreadsheetId,
+                        sheetName: config.sheetName
+                    })
+                });
+
+                const text = await response.text();
+                if (!response.ok) throw new Error(text || '불러오기 실패');
+
+                let payload;
+                try {
+                    payload = JSON.parse(text);
+                } catch {
+                    payload = { members: [] };
+                }
+
+                const resultMembers = Array.isArray(payload.members) ? payload.members : [];
+                if (resultMembers.length === 0) {
+                    alert('불러온 데이터가 없습니다.');
+                    return;
+                }
+
+                members = resultMembers.map((row) => ({
+                    name: row.name || '이름없음',
+                    avg: Number(row.avg) || 150,
+                    gender: row.gender === '여' ? '여' : '남',
+                    isAttending: Number(row.isAttending) === 1,
+                    side: Number(row.side) === 1,
+                    ac: Number(row.ac) === 1,
+                    tt: Number(row.tt) === 1,
+                    scores: [Number(row.score1) || 0, Number(row.score2) || 0, Number(row.score3) || 0, Number(row.score4) || 0],
+                    acSuccess: [Number(row.ac1) === 1, Number(row.ac2) === 1, Number(row.ac3) === 1, Number(row.ac4) === 1],
+                    ttSuccess: [Number(row.tt1) === 1, Number(row.tt2) === 1, Number(row.tt3) === 1, Number(row.tt4) === 1]
+                }));
+
+                saveDatabaseToStorage();
+                renderAll();
+                alert('Google Sheets에서 회원 데이터를 불러왔습니다.');
+            } catch (error) {
+                console.error(error);
+                alert('Google Sheets 불러오기 중 오류가 발생했습니다.\n\n' + error.message);
+            }
+        }
+
         function saveDatabaseToStorage() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(members.map(normalizeMember)));
-            alert('회원 DB가 브라우저에 저장되었습니다.');
         }
 
         function clearDatabase() {
@@ -560,7 +737,7 @@
             const summary = document.getElementById(`game${gameIndex + 1}Summary`);
             summary.innerHTML = `
                 🎯 <b>${gameIndex + 1}게임 미션 풀 현황</b><br>
-                • 올카바(AC) 당사회차 상금: <b>${acPool.toLocaleString()}원</b><br>
+                • 올카바(AC) 당사회차 ���금: <b>${acPool.toLocaleString()}원</b><br>
                 • 텐터키(TT) 당사회차 상금: <b>${ttPool.toLocaleString()}원</b>
             `;
 
@@ -660,6 +837,7 @@
         }
 
         window.onload = function () {
+            populateSheetConfigForm();
             renderAll();
         };
     </script>
