@@ -1,0 +1,890 @@
+// ==========================================
+// Apps Script 백엔드 - Code.gs
+// ==========================================
+
+function doGet(e) {
+  return HtmlService.createHtmlOutput(getHtmlContent())
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function doPost(e) {
+  try {
+    var params = JSON.parse(e.postData.contents);
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Members");
+    
+    if (!sheet) {
+      return createResponse(false, "Members 탭을 찾을 수 없습니다.");
+    }
+    
+    // action에 따른 처리
+    if (params.action === 'loadMembers') {
+      return loadMembers(sheet);
+    }
+    
+    if (params.action === 'saveMembers') {
+      return saveMembers(sheet, params.data || []);
+    }
+    
+    return createResponse(false, "Unknown action");
+    
+  } catch (error) {
+    Logger.log("Error in doPost: " + error.toString());
+    return createResponse(false, error.toString());
+  }
+}
+
+function loadMembers(sheet) {
+  try {
+    var data = sheet.getDataRange().getValues();
+    if (data.length <= 1) {
+      return createResponse(true, "No data", { members: [] });
+    }
+    
+    data.shift(); // 헤더 제외
+    
+    var members = data.map(function(row) {
+      return {
+        name: String(row[0] || "").trim(),
+        avg: Number(row[1]) || 0,
+        gender: String(row[2] || "").trim(),
+        isAttending: Number(row[3]) > 0 ? 1 : 0,
+        side: Number(row[4]) > 0 ? 1 : 0,
+        ac: Number(row[5]) > 0 ? 1 : 0,
+        tt: Number(row[6]) > 0 ? 1 : 0,
+        score1: Number(row[7]) || 0,
+        score2: Number(row[8]) || 0,
+        score3: Number(row[9]) || 0,
+        score4: Number(row[10]) || 0,
+        ac1: Number(row[11]) > 0 ? 1 : 0,
+        ac2: Number(row[12]) > 0 ? 1 : 0,
+        ac3: Number(row[13]) > 0 ? 1 : 0,
+        ac4: Number(row[14]) > 0 ? 1 : 0,
+        tt1: Number(row[15]) > 0 ? 1 : 0,
+        tt2: Number(row[16]) > 0 ? 1 : 0,
+        tt3: Number(row[17]) > 0 ? 1 : 0,
+        tt4: Number(row[18]) > 0 ? 1 : 0
+      };
+    }).filter(function(m) { return m.name !== ""; });
+    
+    return createResponse(true, "Success", { members: members });
+  } catch (error) {
+    Logger.log("Error in loadMembers: " + error.toString());
+    return createResponse(false, error.toString());
+  }
+}
+
+function saveMembers(sheet, data) {
+  try {
+    var existingData = sheet.getDataRange().getValues();
+    
+    data.forEach(function(member) {
+      var found = false;
+      for (var i = 1; i < existingData.length; i++) {
+        if (String(existingData[i][0]).trim() === String(member.name).trim()) {
+          var rowIdx = i + 1;
+          sheet.getRange(rowIdx, 1).setValue(member.name);
+          sheet.getRange(rowIdx, 2).setValue(member.avg);
+          sheet.getRange(rowIdx, 3).setValue(member.gender);
+          sheet.getRange(rowIdx, 4).setValue(member.isAttending);
+          sheet.getRange(rowIdx, 5).setValue(member.side);
+          sheet.getRange(rowIdx, 6).setValue(member.ac);
+          sheet.getRange(rowIdx, 7).setValue(member.tt);
+          sheet.getRange(rowIdx, 8).setValue(member.score1);
+          sheet.getRange(rowIdx, 9).setValue(member.score2);
+          sheet.getRange(rowIdx, 10).setValue(member.score3);
+          sheet.getRange(rowIdx, 11).setValue(member.score4);
+          sheet.getRange(rowIdx, 12).setValue(member.ac1);
+          sheet.getRange(rowIdx, 13).setValue(member.ac2);
+          sheet.getRange(rowIdx, 14).setValue(member.ac3);
+          sheet.getRange(rowIdx, 15).setValue(member.ac4);
+          sheet.getRange(rowIdx, 16).setValue(member.tt1);
+          sheet.getRange(rowIdx, 17).setValue(member.tt2);
+          sheet.getRange(rowIdx, 18).setValue(member.tt3);
+          sheet.getRange(rowIdx, 19).setValue(member.tt4);
+          found = true;
+          break;
+        }
+      }
+      
+      // 새로운 회원 추가
+      if (!found) {
+        sheet.appendRow([
+          member.name, member.avg, member.gender,
+          member.isAttending, member.side, member.ac, member.tt,
+          member.score1, member.score2, member.score3, member.score4,
+          member.ac1, member.ac2, member.ac3, member.ac4,
+          member.tt1, member.tt2, member.tt3, member.tt4
+        ]);
+      }
+    });
+    
+    return createResponse(true, "Members saved successfully");
+  } catch (error) {
+    Logger.log("Error in saveMembers: " + error.toString());
+    return createResponse(false, error.toString());
+  }
+}
+
+function createResponse(success, message, data) {
+  var response = {
+    success: success,
+    message: message
+  };
+  if (data) {
+    response = Object.assign(response, data);
+  }
+  return ContentService.createTextOutput(JSON.stringify(response))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getHtmlContent() {
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Burning crew B.C 통합 정산 프로그램</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-soft: #e8f0fe;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --text: #333;
+            --muted: #666;
+            --border: #dfe3ea;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 18px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin: 0 0 16px;
+            font-size: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+        }
+
+        h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            color: #444;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 6px;
+        }
+
+        .tab-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            background: #e2e8f0;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            color: #334155;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .flex-box {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            resize: vertical;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+            background: #fff;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 8px 6px;
+            text-align: center;
+        }
+
+        th {
+            background: #f8f9fa;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="url"] {
+            width: 100%;
+            min-width: 150px;
+            padding: 6px 8px;
+            text-align: left;
+            font-size: 13px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            text-align: center;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .btn:hover { opacity: 0.96; }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .summary-box {
+            background: var(--primary-soft);
+            border: 1px solid #d4e3ff;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .small-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .sheet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .sheet-grid label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎳 Burning crew B.C 통합 정산 프로그램</h1>
+
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab(0)">1. 회원DB 및 참석</button>
+        <button class="tab-btn" onclick="switchTab(1)">2. 걷을 돈 요약</button>
+        <button class="tab-btn" onclick="switchTab(2)">3. 1게임</button>
+        <button class="tab-btn" onclick="switchTab(3)">4. 2게임</button>
+        <button class="tab-btn" onclick="switchTab(4)">5. 3게임</button>
+        <button class="tab-btn" onclick="switchTab(5)">6. 4게임</button>
+        <button class="tab-btn" onclick="switchTab(6)">7. 최종 순위·상금</button>
+    </div>
+
+    <div class="tab-content active card">
+        <h3>1. 클럽 전체 회원 DB 관리 및 참석자 지정</h3>
+        <p class="muted">줄바꿈 또는 탭으로 구분하여 <b>[이름 에버 성별(남/여)]</b> 순으로 입력한 뒤 DB에 저장하세요.</p>
+
+        <div class="flex-box">
+            <textarea id="memberInput" placeholder="홍길동 185 남&#10;김볼링 172 여&#10;박배치 190 남"></textarea>
+        </div>
+
+        <div class="flex-box">
+            <button class="btn" onclick="registerMembers()">회원 DB에 등록하기</button>
+            <button class="btn btn-success" onclick="saveDatabaseToStorage()">💾 브라우저 DB 저장</button>
+            <button class="btn btn-success" onclick="loadMembersFromGoogleSheets()">Google에서 불러오기</button>
+            <button class="btn" onclick="syncMembersToGoogleSheets()">Google에 저장하기</button>
+            <button class="btn btn-danger" onclick="clearDatabase()">전체 DB 초기화</button>
+        </div>
+
+        <h3 style="margin-top: 20px;">참석자 선택 및 개인 옵션 설정</h3>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>참석</th>
+                        <th>이름</th>
+                        <th>성별</th>
+                        <th>에버</th>
+                        <th>개인사이드</th>
+                        <th>올카바(AC)</th>
+                        <th>텐터키(TT)</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody id="dbTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content card">
+        <h3>2. 걷을 돈 및 미션별 총 금액 현황</h3>
+        <div id="moneySummaryBox" class="summary-box"></div>
+        <div style="overflow-x:auto; margin-top: 12px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>게임비(1.4만)</th>
+                        <th>팀전비(4천)</th>
+                        <th>사이드(2만)</th>
+                        <th>올카바</th>
+                        <th>텐터키</th>
+                        <th>총 입금액</th>
+                    </tr>
+                </thead>
+                <tbody id="moneyTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content card">
+        <h3>3. 1게임 점수 입력 및 미션 성공 체크</h3>
+        <div id="game1Summary" class="summary-box"></div>
+        <div style="overflow-x:auto; margin-top: 10px;">
+            <table>
+                <thead>
+                    <tr><th>이름</th><th>점수</th><th>AC성공</th><th>TT성공</th></tr>
+                </thead>
+                <tbody id="game1TableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content card">
+        <h3>4. 2게임 점수 입력 및 미션 성공 체크</h3>
+        <div id="game2Summary" class="summary-box"></div>
+        <div style="overflow-x:auto; margin-top: 10px;">
+            <table>
+                <thead>
+                    <tr><th>이름</th><th>점수</th><th>AC성공</th><th>TT성공</th></tr>
+                </thead>
+                <tbody id="game2TableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content card">
+        <h3>5. 3게임 점수 입력 및 미션 성공 체크</h3>
+        <div id="game3Summary" class="summary-box"></div>
+        <div style="overflow-x:auto; margin-top: 10px;">
+            <table>
+                <thead>
+                    <tr><th>이름</th><th>점수</th><th>AC성공</th><th>TT성공</th></tr>
+                </thead>
+                <tbody id="game3TableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content card">
+        <h3>6. 4게임 점수 입력 및 미션 성공 체크</h3>
+        <div id="game4Summary" class="summary-box"></div>
+        <div style="overflow-x:auto; margin-top: 10px;">
+            <table>
+                <thead>
+                    <tr><th>이름</th><th>점수</th><th>AC성공</th><th>TT성공</th></tr>
+                </thead>
+                <tbody id="game4TableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content card">
+        <h3>7. 최종 순위 및 상금 정산 결과</h3>
+        <button class="btn btn-success" onclick="exportCSV()">📁 엑셀(CSV) 내보내기</button>
+        <div style="overflow-x:auto; margin-top: 10px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>이름</th>
+                        <th>총점</th>
+                        <th>AVG</th>
+                        <th>미션 환급/상금</th>
+                        <th>최종 정산액</th>
+                    </tr>
+                </thead>
+                <tbody id="resultTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'burning_members_v1';
+
+        const defaultMembers = [
+            { name: '반기용', avg: 185, gender: '남', isAttending: true, side: true, ac: true, tt: true, scores: [170, 180, 190, 185], acSuccess: [false, true, false, false], ttSuccess: [false, false, false, false] },
+            { name: '강찬희', avg: 172, gender: '남', isAttending: true, side: true, ac: true, tt: false, scores: [160, 175, 170, 180], acSuccess: [false, false, false, false], ttSuccess: [false, false, false, false] },
+            { name: '장호정', avg: 190, gender: '여', isAttending: true, side: false, ac: true, tt: true, scores: [190, 185, 200, 195], acSuccess: [true, false, false, false], ttSuccess: [false, true, false, false] },
+            { name: '홍길동', avg: 160, gender: '남', isAttending: false, side: false, ac: false, tt: false, scores: [0, 0, 0, 0], acSuccess: [false, false, false, false], ttSuccess: [false, false, false, false] }
+        ];
+
+        function safeParseMembers() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return defaultMembers.map(cloneMember);
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed) || parsed.length === 0) return defaultMembers.map(cloneMember);
+                return parsed.map(normalizeMember);
+            } catch (error) {
+                console.warn('로컬 저장소 읽기 오류:', error);
+                return defaultMembers.map(cloneMember);
+            }
+        }
+
+        function cloneMember(member) {
+            return {
+                name: member.name,
+                avg: Number(member.avg) || 150,
+                gender: member.gender || '남',
+                isAttending: !!member.isAttending,
+                side: !!member.side,
+                ac: !!member.ac,
+                tt: !!member.tt,
+                scores: Array.isArray(member.scores) ? member.scores.slice(0, 4).map(v => Number(v) || 0) : [0, 0, 0, 0],
+                acSuccess: Array.isArray(member.acSuccess) ? member.acSuccess.slice(0, 4).map(v => !!v) : [false, false, false, false],
+                ttSuccess: Array.isArray(member.ttSuccess) ? member.ttSuccess.slice(0, 4).map(v => !!v) : [false, false, false, false]
+            };
+        }
+
+        function normalizeMember(member) {
+            const clone = cloneMember(member);
+            clone.name = String(clone.name || '이름없음').trim();
+            clone.gender = clone.gender === '여' ? '여' : '남';
+            return clone;
+        }
+
+        let members = safeParseMembers();
+
+        function saveDatabaseToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(members.map(normalizeMember)));
+            alert('브라우저 DB가 저장되었습니다.');
+        }
+
+        function clearDatabase() {
+            if (!confirm('모든 회원 DB를 초기화하시겠습니까?')) return;
+            members = [];
+            localStorage.removeItem(STORAGE_KEY);
+            renderAll();
+            alert('초기화되었습니다.');
+        }
+
+        function registerMembers() {
+            const text = document.getElementById('memberInput').value.trim();
+            if (!text) {
+                alert('회원 명단을 입력해 주세요.');
+                return;
+            }
+
+            const lines = text.split(/\\r?\\n/);
+            lines.forEach((line) => {
+                const trimmed = line.trim();
+                if (!trimmed) return;
+
+                const parts = trimmed.split(/\\s+/);
+                if (parts.length < 2) return;
+
+                const name = parts[0];
+                const avg = Number(parts[1]) || 150;
+                const gender = (parts[2] || '남').toLowerCase() === '여' ? '여' : '남';
+
+                const found = members.find((m) => m.name === name);
+                if (!found) {
+                    members.push({
+                        name,
+                        avg,
+                        gender,
+                        isAttending: true,
+                        side: false,
+                        ac: false,
+                        tt: false,
+                        scores: [0, 0, 0, 0],
+                        acSuccess: [false, false, false, false],
+                        ttSuccess: [false, false, false, false]
+                    });
+                } else {
+                    found.avg = avg;
+                    found.gender = gender;
+                }
+            });
+
+            members.sort((a, b) => b.avg - a.avg);
+            saveDatabaseToStorage();
+            renderAll();
+            alert('회원 등록 및 에버순 정렬이 완료되었습니다!');
+        }
+
+        function switchTab(index) {
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === index);
+            });
+            document.querySelectorAll('.tab-content').forEach((content, idx) => {
+                content.classList.toggle('active', idx === index);
+            });
+            if (index >= 1) renderAll();
+        }
+
+        function toggleAttending(index) {
+            members[index].isAttending = !members[index].isAttending;
+            saveDatabaseToStorage();
+            renderAll();
+        }
+
+        function updateOption(index, field, value) {
+            members[index][field] = value;
+            saveDatabaseToStorage();
+            renderAll();
+        }
+
+        function updateScore(memberIndex, gameIndex, value) {
+            const num = Number(value) || 0;
+            members[memberIndex].scores[gameIndex] = num;
+            saveDatabaseToStorage();
+            renderAll();
+        }
+
+        function toggleMissionSuccess(memberIndex, gameIndex, type) {
+            if (type === 'ac') {
+                members[memberIndex].acSuccess[gameIndex] = !members[memberIndex].acSuccess[gameIndex];
+            }
+            if (type === 'tt') {
+                members[memberIndex].ttSuccess[gameIndex] = !members[memberIndex].ttSuccess[gameIndex];
+            }
+            saveDatabaseToStorage();
+            renderAll();
+        }
+
+        function getAttendingMembers() {
+            return members.filter((m) => m.isAttending);
+        }
+
+        function renderDbTable() {
+            const tbody = document.getElementById('dbTableBody');
+            tbody.innerHTML = '';
+
+            if (members.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8">등록된 회원이 없습니다.</td></tr>';
+                return;
+            }
+
+            members.forEach((member, index) => {
+                tbody.innerHTML += \`
+                    <tr>
+                        <td><input type="checkbox" \${member.isAttending ? 'checked' : ''} onclick="toggleAttending(\${index})" /></td>
+                        <td><b>\${member.name}</b></td>
+                        <td>\${member.gender}</td>
+                        <td>\${member.avg}</td>
+                        <td><input type="checkbox" \${member.side ? 'checked' : ''} onclick="updateOption(\${index}, 'side', this.checked)" /></td>
+                        <td><input type="checkbox" \${member.ac ? 'checked' : ''} onclick="updateOption(\${index}, 'ac', this.checked)" /></td>
+                        <td><input type="checkbox" \${member.tt ? 'checked' : ''} onclick="updateOption(\${index}, 'tt', this.checked)" /></td>
+                        <td><button class="btn btn-danger small-btn" onclick="removeMember(\${index})">삭제</button></td>
+                    </tr>
+                \`;
+            });
+        }
+
+        function removeMember(index) {
+            if (!confirm(\`\${members[index].name} 회원을 삭제할까요?\`)) return;
+            members.splice(index, 1);
+            saveDatabaseToStorage();
+            renderAll();
+        }
+
+        function renderMoneyTab() {
+            const attending = getAttendingMembers();
+            const count = attending.length;
+
+            const totalGameFee = count * 14000;
+            const totalTeamFee = count * 4000;
+            const sideCount = attending.filter((m) => m.side).length;
+            const totalSide = sideCount * 20000;
+            const totalAcCount = attending.filter((m) => m.ac).length;
+            const totalTtCount = attending.filter((m) => m.tt).length;
+            const totalAcMoney = totalAcCount * 8000;
+            const totalTtMoney = totalTtCount * 4000;
+            const grandTotal = totalGameFee + totalTeamFee + totalSide + totalAcMoney + totalTtMoney;
+
+            document.getElementById('moneySummaryBox').innerHTML = \`
+                <b>📊 현장 걷을 돈 총괄 (총 참석 인원: \${count}명)</b><br>
+                • 기본 게임비 (1.4만 × \${count}): <b>\${totalGameFee.toLocaleString()}원</b><br>
+                • 팀전비 (4천 × \${count}): <b>\${totalTeamFee.toLocaleString()}원</b><br>
+                • 개인사이드 신청자 (\${sideCount}명): <b>\${totalSide.toLocaleString()}원</b><br>
+                • 올카바(AC) 신청자 (\${totalAcCount}명): <b>\${totalAcMoney.toLocaleString()}원</b><br>
+                • 텐터키(TT) 신청자 (\${totalTtCount}명): <b>\${totalTtMoney.toLocaleString()}원</b><br>
+                💰 <b>전체 걷을 총 금액: \${grandTotal.toLocaleString()}원</b>
+            \`;
+
+            const tbody = document.getElementById('moneyTableBody');
+            tbody.innerHTML = '';
+
+            if (attending.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">참석자가 없습니다.</td></tr>';
+                return;
+            }
+
+            attending.forEach((member) => {
+                const sidePay = member.side ? 20000 : 0;
+                const acPay = member.ac ? 8000 : 0;
+                const ttPay = member.tt ? 4000 : 0;
+                const totalPay = 14000 + 4000 + sidePay + acPay + ttPay;
+
+                tbody.innerHTML += \`
+                    <tr>
+                        <td><b>\${member.name}</b></td>
+                        <td>14,000</td>
+                        <td>4,000</td>
+                        <td>\${sidePay.toLocaleString()}</td>
+                        <td>\${acPay.toLocaleString()}</td>
+                        <td>\${ttPay.toLocaleString()}</td>
+                        <td><b>\${totalPay.toLocaleString()}원</b></td>
+                    </tr>
+                \`;
+            });
+        }
+
+        function renderGameTab(gameIndex) {
+            const attending = getAttendingMembers();
+            const acPool = attending.filter((m) => m.ac).length * 2000;
+            const ttPool = attending.filter((m) => m.tt).length * 1000;
+
+            const summary = document.getElementById(\`game\${gameIndex + 1}Summary\`);
+            summary.innerHTML = \`
+                🎯 <b>\${gameIndex + 1}게임 미션 풀 현황</b><br>
+                • 올카바(AC) 당사회차 상금: <b>\${acPool.toLocaleString()}원</b><br>
+                • 텐터키(TT) 당사회차 상금: <b>\${ttPool.toLocaleString()}원</b>
+            \`;
+
+            const tbody = document.getElementById(\`game\${gameIndex + 1}TableBody\`);
+            tbody.innerHTML = '';
+
+            if (attending.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">참석자가 없습니다.</td></tr>';
+                return;
+            }
+
+            attending.forEach((member) => {
+                const memberIndex = members.findIndex((m) => m.name === member.name && m.avg === member.avg && m.gender === member.gender);
+                tbody.innerHTML += \`
+                    <tr>
+                        <td><b>\${member.name}</b></td>
+                        <td><input type="number" value="\${member.scores[gameIndex] || 0}" onchange="updateScore(\${memberIndex}, \${gameIndex}, this.value)" /></td>
+                        <td>\${member.ac ? \`<input type="checkbox" \${member.acSuccess[gameIndex] ? 'checked' : ''} onclick="toggleMissionSuccess(\${memberIndex}, \${gameIndex}, 'ac')" />\` : '-'}</td>
+                        <td>\${member.tt ? \`<input type="checkbox" \${member.ttSuccess[gameIndex] ? 'checked' : ''} onclick="toggleMissionSuccess(\${memberIndex}, \${gameIndex}, 'tt')" />\` : '-'}</td>
+                    </tr>
+                \`;
+            });
+        }
+
+        function renderResultTab() {
+            const attending = getAttendingMembers();
+            const rows = attending.map((member) => {
+                const totalScore = (member.scores || [0,0,0,0]).reduce((sum, score) => sum + Number(score || 0), 0);
+                const handicap = member.gender === '여' ? 60 : 0;
+                const finalTotal = totalScore + handicap;
+                const avgScore = (finalTotal / 4).toFixed(1);
+
+                const missionReward =
+                    (member.acSuccess.filter(Boolean).length * 2000) +
+                    (member.ttSuccess.filter(Boolean).length * 1000);
+
+                const entryFee = 14000 + 4000 + (member.side ? 20000 : 0) + (member.ac ? 8000 : 0) + (member.tt ? 4000 : 0);
+                const finalSettlement = entryFee - missionReward;
+
+                return {
+                    ...member,
+                    totalScore: finalTotal,
+                    avgScore,
+                    missionReward,
+                    finalSettlement
+                };
+            }).sort((a, b) => b.totalScore - a.totalScore);
+
+            const tbody = document.getElementById('resultTableBody');
+            tbody.innerHTML = '';
+
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">참석자가 없습니다.</td></tr>';
+                return;
+            }
+
+            rows.forEach((member, rank) => {
+                tbody.innerHTML += \`
+                    <tr>
+                        <td><b>\${rank + 1}위</b></td>
+                        <td><b>\${member.name}</b></td>
+                        <td>\${member.totalScore}</td>
+                        <td>\${member.avgScore}</td>
+                        <td>\${member.missionReward.toLocaleString()}원</td>
+                        <td>\${member.finalSettlement.toLocaleString()}원</td>
+                    </tr>
+                \`;
+            });
+        }
+
+        function renderAll() {
+            renderDbTable();
+            renderMoneyTab();
+            renderGameTab(0);
+            renderGameTab(1);
+            renderGameTab(2);
+            renderGameTab(3);
+            renderResultTab();
+        }
+
+        function exportCSV() {
+            const rows = getAttendingMembers().map((member) => {
+                const totalScore = (member.scores || [0, 0, 0, 0]).reduce((sum, score) => sum + Number(score || 0), 0);
+                const handicap = member.gender === '여' ? 60 : 0;
+                const avgScore = ((totalScore + handicap) / 4).toFixed(1);
+                return \`\${member.name},\${member.gender},\${totalScore + handicap},\${avgScore}\`;
+            });
+
+            const csv = '\\uFEFF이름,성별,총점,AVG\\n' + rows.join('\\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = \`burning_result_\${new Date().toISOString().slice(0, 10)}.csv\`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function loadMembersFromGoogleSheets() {
+            try {
+                const response = await google.script.run.withSuccessHandler(function(result) {
+                    if (!result.members) {
+                        alert('구글 시트에서 데이터를 불러올 수 없습니다.');
+                        return;
+                    }
+
+                    members = result.members.map((row) => ({
+                        name: row.name || '이름없음',
+                        avg: Number(row.avg) || 150,
+                        gender: row.gender === '여' ? '여' : '남',
+                        isAttending: Number(row.isAttending) === 1,
+                        side: Number(row.side) === 1,
+                        ac: Number(row.ac) === 1,
+                        tt: Number(row.tt) === 1,
+                        scores: [Number(row.score1) || 0, Number(row.score2) || 0, Number(row.score3) || 0, Number(row.score4) || 0],
+                        acSuccess: [Number(row.ac1) === 1, Number(row.ac2) === 1, Number(row.ac3) === 1, Number(row.ac4) === 1],
+                        ttSuccess: [Number(row.tt1) === 1, Number(row.tt2) === 1, Number(row.tt3) === 1, Number(row.tt4) === 1]
+                    }));
+
+                    saveDatabaseToStorage();
+                    renderAll();
+                    alert('Google Sheets에서 회원 데이터를 불러왔습니다.');
+                }).loadMembers();
+            } catch (error) {
+                console.error(error);
+                alert('Google Sheets 불러오기 중 오류가 발생했습니다.\\n\\n' + error.message);
+            }
+        }
+
+        async function syncMembersToGoogleSheets() {
+            try {
+                const payload = members.map((member) => ({
+                    name: member.name,
+                    avg: member.avg,
+                    gender: member.gender,
+                    isAttending: member.isAttending ? 1 : 0,
+                    side: member.side ? 1 : 0,
+                    ac: member.ac ? 1 : 0,
+                    tt: member.tt ? 1 : 0,
+                    score1: member.scores[0] || 0,
+                    score2: member.scores[1] || 0,
+                    score3: member.scores[2] || 0,
+                    score4: member.scores[3] || 0,
+                    ac1: member.acSuccess[0] ? 1 : 0,
+                    ac2: member.acSuccess[1] ? 1 : 0,
+                    ac3: member.acSuccess[2] ? 1 : 0,
+                    ac4: member.acSuccess[3] ? 1 : 0,
+                    tt1: member.ttSuccess[0] ? 1 : 0,
+                    tt2: member.ttSuccess[1] ? 1 : 0,
+                    tt3: member.ttSuccess[2] ? 1 : 0,
+                    tt4: member.ttSuccess[3] ? 1 : 0
+                }));
+
+                google.script.run.withSuccessHandler(function(result) {
+                    if (result.success) {
+                        alert('Google Sheets에 저장되었습니다.');
+                    } else {
+                        alert('저장 중 오류: ' + result.message);
+                    }
+                }).saveMembers(payload);
+            } catch (error) {
+                console.error(error);
+                alert('Google Sheets 저장 중 오류가 발생했습니다.\\n\\n' + error.message);
+            }
+        }
+
+        window.onload = function () {
+            renderAll();
+        };
+    </script>
+</body>
+</html>`;
+}
