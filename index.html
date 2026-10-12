@@ -185,7 +185,7 @@
     </style>
 </head>
 <body>
-    <h1>🎳 Burning crew B.C 통합 정산 프로그램</h1>
+    <h1>Bowling Burning crew B.C 통합 정산 프로그램</h1>
 
     <div class="card">
         <h3>모임 유형 및 Google Sheets 연동 설정</h3>
@@ -199,7 +199,7 @@
             </label>
             <label>
                 정기전 날짜 (시트 이름)
-                <input id="sheetName" type="text" placeholder="예: 26.10.12" onchange="saveSheetConfigFromForm()" />
+                <input id="sheetName" type="text" placeholder="예: 26.10.10" onchange="saveSheetConfigFromForm()" />
             </label>
             <label>
                 Apps Script Web App URL
@@ -237,7 +237,7 @@
             • 개인사이드: <b>20,000원</b> | 올카바(AC): <b>8,000원</b> (게임당 2천원) | 텐터키(TT): <b>4,000원</b> (게임당 1천원)
         </div>
 
-        <p class="muted">줄바꿈 또는 탭으로 구분하여 <b>[이름 에버 성별(남/여)]</b> 순으로 입력 후 등록하세요. (신규 회원 추가 시 여기에 입력)</p>
+        <p class="muted">줄바꿈 또는 탭으로 구분하여 <b>[이름 에버 성별(남/여)]</b> 순으로 입력 후 등록하세요.</p>
         <div class="flex-box">
             <textarea id="memberInput" placeholder="홍길동 185 남&#10;김볼링 172 여"></textarea>
         </div>
@@ -380,15 +380,15 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'burning_members_v7';
-        const SHEET_CONFIG_KEY = 'burning_sheet_config_v7';
+        const STORAGE_KEY = 'burning_members_v8';
+        const SHEET_CONFIG_KEY = 'burning_sheet_config_v8';
 
         const defaultMembers = [
             { name: '반기용', avg: 185, gender: '남', isAttending: true, side: true, ac: true, tt: true, paid: true, scores: [170, 180, 190, 185], acSuccess: [false, true, false, false], ttSuccess: [false, false, true, false] },
             { name: '강찬희', avg: 172, gender: '남', isAttending: true, side: true, ac: true, tt: false, paid: false, scores: [160, 175, 170, 180], acSuccess: [false, false, false, false], ttSuccess: [false, false, false, false] }
         ];
 
-        const defaultSheetConfig = { meetingType: 'regular', sheetName: '26.10.12', appsScriptUrl: '', spreadsheetId: '' };
+        const defaultSheetConfig = { meetingType: 'regular', sheetName: '26.10.10', appsScriptUrl: '', spreadsheetId: '' };
         let manualSidePoolOverrides = { 0: null, 1: null, 2: null, 3: null };
 
         function safeParseMembers() {
@@ -439,7 +439,7 @@
         function populateSheetConfigForm() {
             const config = getSheetConfig();
             document.getElementById('meetingType').value = config.meetingType || 'regular';
-            document.getElementById('sheetName').value = config.sheetName || '26.10.12';
+            document.getElementById('sheetName').value = config.sheetName || '26.10.10';
             document.getElementById('sheetAppUrl').value = config.appsScriptUrl || '';
             document.getElementById('sheetId').value = config.spreadsheetId || '';
         }
@@ -469,17 +469,21 @@
                 });
                 const text = await response.text();
                 const payload = JSON.parse(text);
+                if (payload.status === 'error') {
+                    alert('구글 앱스 스크립트 오류: ' + payload.message);
+                    return;
+                }
                 const resMembers = Array.isArray(payload.members) ? payload.members : [];
                 if (resMembers.length === 0) {
-                    alert('불러온 회원 명단이 없습니다.');
+                    alert('구글 시트 Members 탭에 저장된 회원이 없습니다. A열(이름), B열(에버), C열(성별)을 확인해주세요.');
                     return;
                 }
                 members = resMembers.map(normalizeMember);
                 saveDatabaseToStorage();
                 renderAll();
-                alert(`Google Sheets(Members DB + [ ${config.sheetName} ] 기록)에서 전체 명단을 불러왔습니다!`);
+                alert(`Google Sheets(Members DB)에서 ${members.length}명의 회원을 불러왔습니다!`);
             } catch (error) {
-                alert('불러오기 오류: ' + error.message);
+                alert('불러오기 네트워크 오류: ' + error.message);
             }
         }
 
@@ -490,11 +494,17 @@
                 return;
             }
             try {
-                await fetch(config.appsScriptUrl, {
+                const response = await fetch(config.appsScriptUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ action: 'saveMembers', spreadsheetId: config.spreadsheetId, sheetName: config.sheetName, data: members })
                 });
+                const text = await response.text();
+                const payload = JSON.parse(text);
+                if (payload.status === 'error') {
+                    alert('저장 실패: ' + payload.message);
+                    return;
+                }
                 alert(`Members DB 갱신 및 [ ${config.sheetName} ] 시트 저장 완료!`);
             } catch (error) {
                 alert('저장 오류: ' + error.message);
