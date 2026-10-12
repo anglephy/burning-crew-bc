@@ -195,19 +195,11 @@
 
     <div class="card">
         <h3>Google Sheets 연동 설정</h3>
-        <p class="muted">실제 운영용은 Apps Script Web App 기반으로 연결하는 방식이 가장 안전합니다. API 키만으로는 쓰기 권한이 제한될 수 있습니다.</p>
+        <p class="muted">Apps Script Web App URL만 입력하면 자동으로 현재 Google Sheet과 연결됩니다. Sheet ID나 시트 이름은 자동 인식됩니다.</p>
         <div class="sheet-grid">
             <label>
                 Apps Script Web App URL
                 <input id="sheetAppUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
-            </label>
-            <label>
-                Google Sheet ID
-                <input id="sheetId" type="text" placeholder="1AbCd..." />
-            </label>
-            <label>
-                시트 이름
-                <input id="sheetName" type="text" placeholder="BurningCrew" />
             </label>
         </div>
         <div class="flex-box">
@@ -359,16 +351,14 @@
         const SHEET_CONFIG_KEY = 'burning_sheet_config_v1';
 
         const defaultMembers = [
-            { name: '반기용', avg: 185, gender: '남', isAttending: true, side: true, ac: true, tt: true, scores: [170, 180, 190, 185], acSuccess: [false, true, false, false], ttSuccess: [false, false, true, false] },
+            { name: '반기용', avg: 185, gender: '남', isAttending: true, side: true, ac: true, tt: true, scores: [170, 180, 190, 185], acSuccess: [false, true, false, false], ttSuccess: [false, false, false, false] },
             { name: '강찬희', avg: 172, gender: '남', isAttending: true, side: true, ac: true, tt: false, scores: [160, 175, 170, 180], acSuccess: [false, false, false, false], ttSuccess: [false, false, false, false] },
             { name: '장호정', avg: 190, gender: '여', isAttending: true, side: false, ac: true, tt: true, scores: [190, 185, 200, 195], acSuccess: [true, false, false, false], ttSuccess: [false, true, false, false] },
             { name: '홍길동', avg: 160, gender: '남', isAttending: false, side: false, ac: false, tt: false, scores: [0, 0, 0, 0], acSuccess: [false, false, false, false], ttSuccess: [false, false, false, false] }
         ];
 
         const defaultSheetConfig = {
-            appsScriptUrl: '',
-            spreadsheetId: '',
-            sheetName: 'BurningCrew'
+            appsScriptUrl: ''
         };
 
         function safeParseMembers() {
@@ -422,15 +412,11 @@
         function populateSheetConfigForm() {
             const config = getSheetConfig();
             document.getElementById('sheetAppUrl').value = config.appsScriptUrl || '';
-            document.getElementById('sheetId').value = config.spreadsheetId || '';
-            document.getElementById('sheetName').value = config.sheetName || 'BurningCrew';
         }
 
         function saveSheetConfigFromForm() {
             const config = {
-                appsScriptUrl: document.getElementById('sheetAppUrl').value.trim(),
-                spreadsheetId: document.getElementById('sheetId').value.trim(),
-                sheetName: document.getElementById('sheetName').value.trim() || 'BurningCrew'
+                appsScriptUrl: document.getElementById('sheetAppUrl').value.trim()
             };
             localStorage.setItem(SHEET_CONFIG_KEY, JSON.stringify(config));
             alert('Google Sheets 연동 설정이 저장되었습니다.');
@@ -462,8 +448,8 @@
 
         async function syncMembersToGoogleSheets() {
             const config = getSheetConfig();
-            if (!config.appsScriptUrl || !config.spreadsheetId) {
-                alert('Apps Script URL과 시트 ID를 먼저 입력하세요.');
+            if (!config.appsScriptUrl) {
+                alert('Apps Script URL을 먼저 입력하세요.');
                 return;
             }
 
@@ -473,8 +459,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         action: 'saveMembers',
-                        spreadsheetId: config.spreadsheetId,
-                        sheetName: config.sheetName,
                         data: getGoogleSheetPayload()
                     })
                 });
@@ -490,8 +474,8 @@
 
         async function loadMembersFromGoogleSheets() {
             const config = getSheetConfig();
-            if (!config.appsScriptUrl || !config.spreadsheetId) {
-                alert('Apps Script URL과 시트 ID를 먼저 입력하세요.');
+            if (!config.appsScriptUrl) {
+                alert('Apps Script URL을 먼저 입력하세요.');
                 return;
             }
 
@@ -500,9 +484,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        action: 'loadMembers',
-                        spreadsheetId: config.spreadsheetId,
-                        sheetName: config.sheetName
+                        action: 'loadMembers'
                     })
                 });
 
@@ -737,7 +719,7 @@
             const summary = document.getElementById(`game${gameIndex + 1}Summary`);
             summary.innerHTML = `
                 🎯 <b>${gameIndex + 1}게임 미션 풀 현황</b><br>
-                • 올카바(AC) 당사회차 ���금: <b>${acPool.toLocaleString()}원</b><br>
+                • 올카바(AC) 당사회차 상금: <b>${acPool.toLocaleString()}원</b><br>
                 • 텐터키(TT) 당사회차 상금: <b>${ttPool.toLocaleString()}원</b>
             `;
 
